@@ -136,7 +136,7 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
         cart.forEach((item) => {
             if (productId === item.productId) {
                 matchingItem = item;
-            } 
+            }
         });
 
         // truthy/falsy value to check if there is a matching exist.
@@ -148,10 +148,22 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
                 productId: productId,
                 quantity: 1
             })
-            
-        }
 
-        console.log(cart);
+        }
+        // console.log(cart);
+
+        // total quantity of the cart:
+        let cartQuantity = 0;
+        cart.forEach((item) => {
+            cartQuantity = cartQuantity + item.quantity;
+        });
+        // console.log(cartQuantity);
+
+        // put it on html
+        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+
     })
+
+
 
 });
