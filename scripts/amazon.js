@@ -108,12 +108,12 @@ products.forEach((product) => {
 
           <div class="product-spacer"></div>
 
-          <div class="added-to-cart">
+          <div class="added-to-cart ">
             <img src="images/icons/checkmark.png">
             Added
           </div>
 
-          <button class="add-to-cart-button button-primary">
+          <button class="add-to-cart-button button-primary js-added-to-cart-button" data-product-id="${product.id}">
             Add to Cart
           </button>
         </div> `;
@@ -121,3 +121,37 @@ products.forEach((product) => {
 
 console.log(productsHTML);
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
+
+// interaction of add to cart button
+document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
+    button.addEventListener('click', () => {
+        const productId = button.dataset.productId;
+        // kabab -> caml case when we want to use "data-"
+        // console.log(`everything working! ${productName}`);
+
+        // check if this product already in the cart, if exist then quantity +1, else push an new object.
+        // remember to loop through and then find out if the whole cart exist such a particular product. 
+
+        let matchingItem;
+        cart.forEach((item) => {
+            if (productId === item.productId) {
+                matchingItem = item;
+            } 
+        });
+
+        // truthy/falsy value to check if there is a matching exist.
+        // we prefer using id to distinguish different items.
+        if (matchingItem) {
+            matchingItem.quantity += 1;
+        } else {
+            cart.push({
+                productId: productId,
+                quantity: 1
+            })
+            
+        }
+
+        console.log(cart);
+    })
+
+});
