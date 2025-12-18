@@ -1,69 +1,7 @@
 // data structure of the products in grid.
 // data folder already provided the array, hence just use it.
 // remember js code run one by one in html file, so order matters.
-/*
-const products = [
-    {
-        //1st
-        image: 'images/products/athletic-cotton-socks-6-pairs.jpg',
-        name: 'Black and Gray Athletic Cotton Socks - 6 Pairs',
-        rating: {
-            stars: 4.5,
-            count: 87
-        },
-        priceCents: 1090
-    }, {
-        //2nd
-        image: 'images/products/intermediate-composite-basketball.jpg',
-        name: 'Intermediate Size Basketball',
-        rating: {
-            stars: 4,
-            count: 127
-        },
-        priceCents: 2095
 
-    }, {
-        // 3rd
-        image: 'images/products/adults-plain-cotton-tshirt-2-pack-teal.jpg',
-        name: 'Adults Plain Cotton T-Shirt - 2 Pack',
-        rating: {
-            stars: 4.5,
-            count: 56
-        },
-        priceCents: 799
-
-    }, {
-        // 4th
-        image: 'images/products/black-2-slot-toaster.jpg',
-        name: '2 Slot Toaster - Black',
-        rating: {
-            stars: 4,
-            count: 2197
-        },
-        priceCents: 1899
-
-    }, {
-        // 5th
-        image: 'images/products/6-piece-white-dinner-plate-set.jpg',
-        name: '6 Piece White Dinner Plate Set',
-        rating: {
-            stars: 4,
-            count: 37
-        },
-        priceCents: 2067
-
-    }, {
-        // 6rd
-        image: 'images/products/6-piece-non-stick-baking-set.webp',
-        name: '6-Piece Nonstick, Carbon Steel Oven Bakeware Baking Set',
-        rating: {
-            stars: 4.5,
-            count: 175
-        },
-        priceCents: 3499
-
-    }];
-*/
 let productsHTML = '';
 // loop through the product array and create single product's html
 products.forEach((product) => {
@@ -108,7 +46,7 @@ products.forEach((product) => {
 
           <div class="product-spacer"></div>
 
-          <div class="added-to-cart ">
+          <div class="added-to-cart js-added-to-cart-${product.id}">
             <img src="images/icons/checkmark.png">
             Added
           </div>
@@ -121,6 +59,9 @@ products.forEach((product) => {
 
 console.log(productsHTML);
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
+
+// exercise 13 challenge
+let addedMessageTimeoutId;
 
 // interaction of add to cart button
 document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
@@ -143,7 +84,7 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
 
         //exercise 13 a-f, selector for quantity number
         const quantitySelector = document.querySelector(`.js-quantity-selector-${productId}`);
-        const productAddQuantity =quantitySelector.value;
+        const productAddQuantity = quantitySelector.value;
 
         // truthy/falsy value to check if there is a matching exist.
         // we prefer using id to distinguish different items.
@@ -154,7 +95,7 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
                 //productId: productId,
                 // shortcut version for the same name
                 productId,
-                quantity:  Number(productAddQuantity)
+                quantity: Number(productAddQuantity)
             })
 
         }
@@ -170,8 +111,22 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
         // put it on html
         document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
 
+        // exercise 13 i-m, added message, refresh timeout
+        // if there is a timeout within 2s(haven't been removed and clicked twice, then we remove it and refresh the 2s timer.)
+        const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
+        const addToCartMessage = addToCartSelector.classList.add('added-to-cart-seen');
+        if (addedMessageTimeoutId) {
+            clearTimeout(addedMessageTimeoutId);   
+        }
+        
+        const timeoutId = setTimeout(() => {
+                addToCartSelector.classList.remove('added-to-cart-seen');
+            }, 2000);
 
-    })
+        addedMessageTimeoutId = timeoutId;
+
+
+    });
 
 
 
