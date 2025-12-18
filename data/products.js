@@ -657,4 +657,20 @@ const products = [
       "mens"
     ]
   }
+  ,
+  {
+    id: "0123",
+    image: "images/products/puppy.jpg",
+    name: "lovely puppy",
+    rating: {
+      stars: 5,
+      count: 1000
+    },
+    priceCents: 999999,
+    keywords: [
+      "pets",
+      "family",
+      "dogs"
+    ]
+  }
 ];

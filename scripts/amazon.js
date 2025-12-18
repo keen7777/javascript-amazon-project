@@ -125,7 +125,9 @@ document.querySelector('.js-products-grid').innerHTML = productsHTML;
 // interaction of add to cart button
 document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
     button.addEventListener('click', () => {
-        const productId = button.dataset.productId;
+        // const productId = button.dataset.productId; 
+        // shortcut version
+        const { productId } = button.dataset;
         // kabab -> caml case when we want to use "data-"
         // console.log(`everything working! ${productName}`);
 
@@ -149,7 +151,9 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
             matchingItem.quantity += Number(productAddQuantity);
         } else {
             cart.push({
-                productId: productId,
+                //productId: productId,
+                // shortcut version for the same name
+                productId,
                 quantity:  Number(productAddQuantity)
             })
 
