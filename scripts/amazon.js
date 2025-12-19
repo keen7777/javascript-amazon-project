@@ -10,6 +10,7 @@
 // import {cart as myCart} from '../data/cart.js';
 
 import {cart} from '../data/cart.js';
+import {products} from '../data/products.js';
 /*
 const products = [
     {
