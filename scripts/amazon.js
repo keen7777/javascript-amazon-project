@@ -1,6 +1,15 @@
 // data structure of the products in grid.
 // data folder already provided the array, hence just use it.
 // remember js code run one by one in html file, so order matters.
+
+// import variable from other js files that we want to use here:
+// always put them on top
+// with that we don't need to care about the order of the files.(*^_^*)
+
+// can also rename it to avoid conflicts
+// import {cart as myCart} from '../data/cart.js';
+
+import {cart} from '../data/cart.js';
 /*
 const products = [
     {
