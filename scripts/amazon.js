@@ -2,6 +2,18 @@
 // data folder already provided the array, hence just use it.
 // remember js code run one by one in html file, so order matters.
 
+// import variable from other js files that we want to use here:
+// always put them on top
+// with that we don't need to care about the order of the files.(*^_^*)
+
+// can also rename it to avoid conflicts
+// import {cart as myCart} from '../data/cart.js';
+// import * as cartModule from '../data/cart.js';
+
+import { cart, addToCart } from '../data/cart.js';
+import { products } from '../data/products.js';
+import { formatCurrency } from './utils/money.js'
+
 let productsHTML = '';
 // loop through the product array and create single product's html
 products.forEach((product) => {
@@ -26,7 +38,7 @@ products.forEach((product) => {
           </div>
 
           <div class="product-price">
-            $${(product.priceCents / 100).toFixed(2)}
+            $${formatCurrency(product.priceCents)}
           </div>
 
           <div class="product-quantity-container">
@@ -63,6 +75,20 @@ document.querySelector('.js-products-grid').innerHTML = productsHTML;
 // exercise 13 challenge
 let addedMessageTimeoutId;
 
+function updateCartQuantity() {
+    // total quantity of the cart:
+    let cartQuantity = 0;
+    cart.forEach((cartItem) => {
+        cartQuantity = cartQuantity + cartItem.quantity;
+    });
+    // console.log(cartQuantity);
+
+    // put it on html
+    // bc we modify html here to this function stays inside amazon.js
+    document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+}
+
+
 // interaction of add to cart button
 document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
     button.addEventListener('click', () => {
@@ -70,64 +96,24 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
         // shortcut version
         const { productId } = button.dataset;
         // kabab -> caml case when we want to use "data-"
-        // console.log(`everything working! ${productName}`);
-
-        // check if this product already in the cart, if exist then quantity +1, else push an new object.
-        // remember to loop through and then find out if the whole cart exist such a particular product. 
-
-        let matchingItem;
-        cart.forEach((item) => {
-            if (productId === item.productId) {
-                matchingItem = item;
-            }
-        });
-
-        //exercise 13 a-f, selector for quantity number
-        const quantitySelector = document.querySelector(`.js-quantity-selector-${productId}`);
-        const productAddQuantity = quantitySelector.value;
-
-        // truthy/falsy value to check if there is a matching exist.
-        // we prefer using id to distinguish different items.
-        if (matchingItem) {
-            matchingItem.quantity += Number(productAddQuantity);
-        } else {
-            cart.push({
-                //productId: productId,
-                // shortcut version for the same name
-                productId,
-                quantity: Number(productAddQuantity)
-            })
-
-        }
-        // console.log(cart);
-
-        // total quantity of the cart:
-        let cartQuantity = 0;
-        cart.forEach((item) => {
-            cartQuantity = cartQuantity + item.quantity;
-        });
-        // console.log(cartQuantity);
-
-        // put it on html
-        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
-
+        addToCart(productId);
         // exercise 13 i-m, added message, refresh timeout
         // if there is a timeout within 2s(haven't been removed and clicked twice, then we remove it and refresh the 2s timer.)
         const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
         const addToCartMessage = addToCartSelector.classList.add('added-to-cart-seen');
         if (addedMessageTimeoutId) {
-            clearTimeout(addedMessageTimeoutId);   
+            clearTimeout(addedMessageTimeoutId);
         }
-        
-        const timeoutId = setTimeout(() => {
-                addToCartSelector.classList.remove('added-to-cart-seen');
-            }, 2000);
 
+        const timeoutId = setTimeout(() => {
+            addToCartSelector.classList.remove('added-to-cart-seen');
+        }, 2000);
         addedMessageTimeoutId = timeoutId;
 
 
+        // total quantity of the cart and update html
+        updateCartQuantity();
+
     });
-
-
 
 });
