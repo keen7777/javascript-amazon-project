@@ -8,9 +8,10 @@
 
 // can also rename it to avoid conflicts
 // import {cart as myCart} from '../data/cart.js';
+// import * as cartModule from '../data/cart.js';
 
-import {cart} from '../data/cart.js';
-import {products} from '../data/products.js';
+import { cart, addToCart } from '../data/cart.js';
+import { products } from '../data/products.js';
 /*
 const products = [
     {
@@ -31,46 +32,6 @@ const products = [
             count: 127
         },
         priceCents: 2095
-
-    }, {
-        // 3rd
-        image: 'images/products/adults-plain-cotton-tshirt-2-pack-teal.jpg',
-        name: 'Adults Plain Cotton T-Shirt - 2 Pack',
-        rating: {
-            stars: 4.5,
-            count: 56
-        },
-        priceCents: 799
-
-    }, {
-        // 4th
-        image: 'images/products/black-2-slot-toaster.jpg',
-        name: '2 Slot Toaster - Black',
-        rating: {
-            stars: 4,
-            count: 2197
-        },
-        priceCents: 1899
-
-    }, {
-        // 5th
-        image: 'images/products/6-piece-white-dinner-plate-set.jpg',
-        name: '6 Piece White Dinner Plate Set',
-        rating: {
-            stars: 4,
-            count: 37
-        },
-        priceCents: 2067
-
-    }, {
-        // 6rd
-        image: 'images/products/6-piece-non-stick-baking-set.webp',
-        name: '6-Piece Nonstick, Carbon Steel Oven Bakeware Baking Set',
-        rating: {
-            stars: 4.5,
-            count: 175
-        },
-        priceCents: 3499
 
     }];
 */
@@ -132,6 +93,19 @@ products.forEach((product) => {
 console.log(productsHTML);
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
 
+function updateCartQuantity() {
+    // total quantity of the cart:
+        let cartQuantity = 0;
+        cart.forEach((cartItem) => {
+            cartQuantity = cartQuantity + cartItem.quantity;
+        });
+        // console.log(cartQuantity);
+
+        // put it on html
+        // bc we modify html here to this function stays inside amazon.js
+        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+    
+}
 // interaction of add to cart button
 document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
     button.addEventListener('click', () => {
@@ -139,41 +113,10 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
         // kabab -> caml case when we want to use "data-"
         // console.log(`everything working! ${productName}`);
 
-        // check if this product already in the cart, if exist then quantity +1, else push an new object.
-        // remember to loop through and then find out if the whole cart exist such a particular product. 
+        addToCart(productId);
+        updateCartQuantity();
 
-        let matchingItem;
-        cart.forEach((item) => {
-            if (productId === item.productId) {
-                matchingItem = item;
-            }
-        });
+        
 
-        // truthy/falsy value to check if there is a matching exist.
-        // we prefer using id to distinguish different items.
-        if (matchingItem) {
-            matchingItem.quantity += 1;
-        } else {
-            cart.push({
-                productId: productId,
-                quantity: 1
-            })
-
-        }
-        // console.log(cart);
-
-        // total quantity of the cart:
-        let cartQuantity = 0;
-        cart.forEach((item) => {
-            cartQuantity = cartQuantity + item.quantity;
-        });
-        // console.log(cartQuantity);
-
-        // put it on html
-        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
-
-    })
-
-
-
+    });
 });
