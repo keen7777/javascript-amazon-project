@@ -4,10 +4,7 @@ export let cart = loadFromStorage('cart');
 
 if (!cart) {
     cart = [{
-        productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-        quantity: 2
-    }, {
-        productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
+        productId: '0123',
         quantity: 1
     }];
 }
@@ -31,25 +28,31 @@ function loadFromStorage(str) {
 export function addToCart(productId) {
     // check if this product already in the cart, if exist then quantity +1, else push an new object.
     // remember to loop through and then find out if the whole cart exist such a particular product. 
+
     let matchingItem;
-    cart.forEach((cartItem) => {
-        if (productId === cartItem.productId) {
-            matchingItem = cartItem;
+    cart.forEach((item) => {
+        if (productId === item.productId) {
+            matchingItem = item;
         }
     });
+
+    //exercise 13 a-f, selector for quantity number
+    const quantitySelector = document.querySelector(`.js-quantity-selector-${productId}`);
+    const productAddQuantity = quantitySelector.value;
 
     // truthy/falsy value to check if there is a matching exist.
     // we prefer using id to distinguish different items.
     if (matchingItem) {
-        matchingItem.quantity += 1;
+        matchingItem.quantity += Number(productAddQuantity);
     } else {
         cart.push({
-            productId: productId,
-            quantity: 1
+            //productId: productId,
+            // shortcut version for the same name
+            productId,
+            quantity: Number(productAddQuantity)
         })
-        // console.log(cart);
-        saveToStorage();
     }
+    saveToStorage();
 }
 
 export function removeFromCart(productId) {
