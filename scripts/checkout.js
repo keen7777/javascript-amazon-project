@@ -107,6 +107,7 @@ const quantity = calculateCartQuantity(cart);
 updateCartQuantityDisplay(quantity);
 
 
+
 // use Event Delegation, bubbling
 document.querySelector('.js-order-summary').addEventListener('click', (e) => {
   const deleteLink = e.target.closest('.js-delete-link');
