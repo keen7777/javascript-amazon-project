@@ -82,25 +82,25 @@ export function calculateCartQuantity(cart) {
 
 // exercise 14: k, update the items number using Update button in the cart(???)
 export function handleUpdateQuantity(inputString, productId) {
-    const updateQuantity = Number(inputString);
-    let savedQuantity;
+    const newQuantity = Number(inputString);
 
-    cart.forEach((cartItem) => {
-        if (cartItem.productId === productId) {
-            savedQuantity = cartItem.quantity + updateQuantity;
-            // console.log(`new saved data is ${cartItem.quantity}`);
-            // console.log(cart);
-            if (savedQuantity > 1000 || savedQuantity < 0) {
-                alert('Quantity must be at least 0 and less than 1000!');
-                savedQuantity = cartItem.quantity;
-            } else {
-                cartItem.quantity = cartItem.quantity + updateQuantity;;
-            }
-            
+    cart.forEach(cartItem => {
+        if (cartItem.productId !== productId) return;
+
+        if (
+            Number.isNaN(newQuantity) ||
+            newQuantity < 0 ||
+            newQuantity > 1000
+        ) {
+            alert('Quantity must be between 0 and 1000');
+            return; // 什么都不改
         }
+
+        cartItem.quantity = newQuantity;
     });
+
     saveToStorage();
-    return savedQuantity;
+    return newQuantity;
 }
 
 // helper functions ends-------------------------------------------
