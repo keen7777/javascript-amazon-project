@@ -10,15 +10,16 @@
 // import {cart as myCart} from '../data/cart.js';
 // import * as cartModule from '../data/cart.js';
 
-import { cart, addToCart } from '../data/cart.js';
+import { cart, addToCart, calculateCartQuantity } from '../data/cart.js';
 import { products } from '../data/products.js';
-import { formatCurrency } from './utils/money.js'
+import { formatCurrency } from './utils/money.js';
+import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
 let productsHTML = '';
 // loop through the product array and create single product's html
 products.forEach((product) => {
-    // accumulator Pattern
-    productsHTML = productsHTML + `
+  // accumulator Pattern
+  productsHTML = productsHTML + `
         <div class="product-container">
           <div class="product-image-container">
             <img class="product-image"
@@ -71,49 +72,42 @@ products.forEach((product) => {
 
 console.log(productsHTML);
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
+// update UI and calculate current item amount:
+const quantity = calculateCartQuantity(cart);
+updateCartQuantityDisplay(quantity);
+
 
 // exercise 13 challenge
 let addedMessageTimeoutId;
 
-function updateCartQuantity() {
-    // total quantity of the cart:
-    let cartQuantity = 0;
-    cart.forEach((cartItem) => {
-        cartQuantity = cartQuantity + cartItem.quantity;
-    });
-    // console.log(cartQuantity);
-
-    // put it on html
-    // bc we modify html here to this function stays inside amazon.js
-    document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
-}
 
 
-// interaction of add to cart button
+// interaction of add to cart button，debug, refresh the exactly timeout, not the previous one. 
+const addedMessageTimeouts = {}; // store timeout per product
+
 document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
-    button.addEventListener('click', () => {
-        // const productId = button.dataset.productId; 
-        // shortcut version
-        const { productId } = button.dataset;
-        // kabab -> caml case when we want to use "data-"
-        addToCart(productId);
-        // exercise 13 i-m, added message, refresh timeout
-        // if there is a timeout within 2s(haven't been removed and clicked twice, then we remove it and refresh the 2s timer.)
-        const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
-        const addToCartMessage = addToCartSelector.classList.add('added-to-cart-seen');
-        if (addedMessageTimeoutId) {
-            clearTimeout(addedMessageTimeoutId);
-        }
+  button.addEventListener('click', () => {
+    const { productId } = button.dataset;
 
-        const timeoutId = setTimeout(() => {
-            addToCartSelector.classList.remove('added-to-cart-seen');
-        }, 2000);
-        addedMessageTimeoutId = timeoutId;
+    addToCart(productId);
 
+    const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
+    addToCartSelector.classList.add('added-to-cart-seen');
 
-        // total quantity of the cart and update html
-        updateCartQuantity();
+    // clear previous timeout for this product only
+    if (addedMessageTimeouts[productId]) {
+      clearTimeout(addedMessageTimeouts[productId]);
+    }
 
-    });
+    // set new timeout for this product
+    addedMessageTimeouts[productId] = setTimeout(() => {
+      addToCartSelector.classList.remove('added-to-cart-seen');
+      delete addedMessageTimeouts[productId]; // clean up
+    }, 2000);
 
+    // update total cart quantity
+    const quantity = calculateCartQuantity(cart);
+    updateCartQuantityDisplay(quantity);
+  });
 });
+

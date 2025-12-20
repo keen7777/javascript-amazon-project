@@ -1,21 +1,23 @@
-import { cart, removeFromCart } from '../data/cart.js'
+import { cart, removeFromCart, calculateCartQuantity } from '../data/cart.js'
 import { products } from '../data/products.js';
-import { formatCurrency } from './utils/money.js'
+import { formatCurrency } from './utils/money.js';
+import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
 let cartSummaryHTML = '';
 
-cart.forEach(cartItem => {
-    const productId = cartItem.productId;
-    let matchingProduct;
-    products.forEach(product => {
-        if (product.id === productId) {
-            matchingProduct = product;
-        }
 
-    });
-    // console.log(matchingProduct);
-    cartSummaryHTML = cartSummaryHTML +
-        `
+cart.forEach(cartItem => {
+  const productId = cartItem.productId;
+  let matchingProduct;
+  products.forEach(product => {
+    if (product.id === productId) {
+      matchingProduct = product;
+    }
+
+  });
+  // console.log(matchingProduct);
+  cartSummaryHTML = cartSummaryHTML +
+    `
         <div class="cart-item-container js-cart-item-container-${matchingProduct.id}">
             <div class="delivery-date">
               Delivery date: Tuesday, June 21
@@ -96,15 +98,23 @@ cart.forEach(cartItem => {
 });
 
 document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
+const quantity = calculateCartQuantity(cart);
+updateCartQuantityDisplay(quantity);
 
-document.querySelectorAll('.js-delete-link')
-    .forEach(link => {
-        link.addEventListener('click', () => {
-            const productId = link.dataset.productId;
-            removeFromCart(productId);
-            // get the container that need to be deleted via id, then remove.
-            const container = document.querySelector(`.js-cart-item-container-${productId}`);
-            container.remove();
-         })
 
-    });
+// use Event Delegation, bubbling
+document.querySelector('.js-order-summary').addEventListener('click', (e) => {
+  const link = e.target.closest('.js-delete-link');
+  if (!link) return;
+
+  const productId = link.dataset.productId;
+  removeFromCart(productId);
+
+  const container = document.querySelector(`.js-cart-item-container-${productId}`);
+  if (container) container.remove();
+
+  const quantity = calculateCartQuantity(cart);
+  updateCartQuantityDisplay(quantity);
+});
+
+

@@ -66,3 +66,17 @@ export function removeFromCart(productId) {
     cart = newCart;
     saveToStorage();
 }
+
+// exercise 14: a-bc, update the items number in checkout item(???)
+// helper function: -------------------------------------------
+export function calculateCartQuantity(cart) {
+  // total quantity of the cart:
+  let cartQuantity = 0;
+  cart.forEach((cartItem) => {
+    cartQuantity = cartQuantity + cartItem.quantity;
+  });
+  return cartQuantity;
+  // just to make it identical with tutorial.
+}
+
+// helper functions ends-------------------------------------------
