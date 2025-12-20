@@ -67,16 +67,40 @@ export function removeFromCart(productId) {
     saveToStorage();
 }
 
-// exercise 14: a-bc, update the items number in checkout item(???)
+
+// exercise 14: a-c, update the items number in checkout item(???)
 // helper function: -------------------------------------------
 export function calculateCartQuantity(cart) {
-  // total quantity of the cart:
-  let cartQuantity = 0;
-  cart.forEach((cartItem) => {
-    cartQuantity = cartQuantity + cartItem.quantity;
-  });
-  return cartQuantity;
-  // just to make it identical with tutorial.
+    // total quantity of the cart:
+    let cartQuantity = 0;
+    cart.forEach((cartItem) => {
+        cartQuantity = cartQuantity + cartItem.quantity;
+    });
+    return cartQuantity;
+    // just to make it identical with tutorial.
+}
+
+// exercise 14: k, update the items number using Update button in the cart(???)
+export function handleUpdateQuantity(inputString, productId) {
+    const updateQuantity = Number(inputString);
+    let savedQuantity;
+
+    cart.forEach((cartItem) => {
+        if (cartItem.productId === productId) {
+            savedQuantity = cartItem.quantity + updateQuantity;
+            // console.log(`new saved data is ${cartItem.quantity}`);
+            // console.log(cart);
+            if (savedQuantity > 1000 || savedQuantity < 0) {
+                alert('Quantity must be at least 0 and less than 1000!');
+                savedQuantity = cartItem.quantity;
+            } else {
+                cartItem.quantity = cartItem.quantity + updateQuantity;;
+            }
+            
+        }
+    });
+    saveToStorage();
+    return savedQuantity;
 }
 
 // helper functions ends-------------------------------------------
