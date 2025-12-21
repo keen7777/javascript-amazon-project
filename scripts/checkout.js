@@ -1,4 +1,4 @@
-import { cart, removeFromCart , updateDeliveryOption} from '../data/cart.js';
+import { cart, removeFromCart, updateDeliveryOption } from '../data/cart.js';
 import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js'
 import { hello } from 'https://unpkg.com/supersimpledev@1.0.1/hello.esm.js';
@@ -9,35 +9,39 @@ import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 // use DayJS external library to handle delivery options.(always been minification for smaller data size)
 import { deliveryOptions } from '../data/deliveryOptions.js';
 
-let cartSummaryHTML = '';
-
-cart.forEach(cartItem => {
-  const productId = cartItem.productId;
-  let matchingProduct;
-  products.forEach(product => {
-    if (product.id === productId) {
-      matchingProduct = product;
-    }
-  });
+function renderOrderSummary() {
 
 
-  // 从配送方式列表中，找到当前商品已选择的那一种
-  // 从cartItem的id里面找具体的价钱和日期，完整的option（相当于是嵌套）
-  const deliveryOptionId = cartItem.deliveryOptionId;
-  let deliveryOption;
-  deliveryOptions.forEach((option) => {
-    if (option.id === deliveryOptionId) {
-      deliveryOption = option;
-    }
-  });
 
-  const today = dayjs();
-  const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
-  const dateString = deliveryDate.format('dddd, MMMM D');
+  let cartSummaryHTML = '';
 
-  // console.log(matchingProduct);
-  cartSummaryHTML = cartSummaryHTML +
-    `
+  cart.forEach(cartItem => {
+    const productId = cartItem.productId;
+    let matchingProduct;
+    products.forEach(product => {
+      if (product.id === productId) {
+        matchingProduct = product;
+      }
+    });
+
+
+    // 从配送方式列表中，找到当前商品已选择的那一种
+    // 从cartItem的id里面找具体的价钱和日期，完整的option（相当于是嵌套）
+    const deliveryOptionId = cartItem.deliveryOptionId;
+    let deliveryOption;
+    deliveryOptions.forEach((option) => {
+      if (option.id === deliveryOptionId) {
+        deliveryOption = option;
+      }
+    });
+
+    const today = dayjs();
+    const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
+    const dateString = deliveryDate.format('dddd, MMMM D');
+
+    // console.log(matchingProduct);
+    cartSummaryHTML = cartSummaryHTML +
+      `
         <div class="cart-item-container js-cart-item-container-${matchingProduct.id}">
             <div class="delivery-date">
               Delivery date: ${dateString}
@@ -77,25 +81,25 @@ cart.forEach(cartItem => {
             </div>
           </div>
   `;
-});
+  });
 
-// function to create delivery Html
-// 给某一个商品，生成它的全部配送方式，并自动勾选当前选择的那一个
-function deliveryOptionsHTML(matchingProduct, cartItem) {
-  let html = '';
+  // function to create delivery Html
+  // 给某一个商品，生成它的全部配送方式，并自动勾选当前选择的那一个
+  function deliveryOptionsHTML(matchingProduct, cartItem) {
+    let html = '';
 
-  deliveryOptions.forEach((deliveryOption) => {
-    const deliveryDate = dayjs().add(deliveryOption.deliveryDays, 'days');
-    const dateString = deliveryDate.format('dddd, MMMM D');
-    // if 0, then Free shipping else show price
-    const priceString = deliveryOption.priceCents === 0
-      ? 'FREE Shipping'
-      : `$${formatCurrency(deliveryOption.priceCents)}-Shipping`;
-    //deal with choosing one of the delivery options:
-    const isChecked = deliveryOption.id === cartItem.deliveryOptionId
-    // concat html here
-    html +=
-      `<div class="delivery-option js-delivery-option"
+    deliveryOptions.forEach((deliveryOption) => {
+      const deliveryDate = dayjs().add(deliveryOption.deliveryDays, 'days');
+      const dateString = deliveryDate.format('dddd, MMMM D');
+      // if 0, then Free shipping else show price
+      const priceString = deliveryOption.priceCents === 0
+        ? 'FREE Shipping'
+        : `$${formatCurrency(deliveryOption.priceCents)}-Shipping`;
+      //deal with choosing one of the delivery options:
+      const isChecked = deliveryOption.id === cartItem.deliveryOptionId
+      // concat html here
+      html +=
+        `<div class="delivery-option js-delivery-option"
         data-product-id="${matchingProduct.id}"
         data-delivery-option-id="${deliveryOption.id}">
       <input 
@@ -109,34 +113,37 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
       </div>
     </div>
     `;
-  });
-  return html;
+    });
+    return html;
+  }
+
+  document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
+
+  //delete logic
+  document.querySelectorAll('.js-delete-link')
+    .forEach(link => {
+      link.addEventListener('click', () => {
+        const productId = link.dataset.productId;
+        removeFromCart(productId);
+        // get the container that need to be deleted via id, then remove.
+        const container = document.querySelector(`.js-cart-item-container-${productId}`);
+        container.remove();
+      })
+    });
+
+  // update delivery logic:
+
+  document.querySelectorAll('.js-delivery-option')
+    .forEach((element) => {
+      element.addEventListener('click', () => {
+        // shorthand property
+        const { productId, deliveryOptionId } = element.dataset;
+        updateDeliveryOption(productId, deliveryOptionId);
+        renderOrderSummary();
+      })
+    });
 }
-
-document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
-
-//delete logic
-document.querySelectorAll('.js-delete-link')
-  .forEach(link => {
-    link.addEventListener('click', () => {
-      const productId = link.dataset.productId;
-      removeFromCart(productId);
-      // get the container that need to be deleted via id, then remove.
-      const container = document.querySelector(`.js-cart-item-container-${productId}`);
-      container.remove();
-    })
-  });
-
-// update delivery logic:
-
-document.querySelectorAll('.js-delivery-option')
-  .forEach((element) => {
-    element.addEventListener('click', () => {
-      // shorthand property
-      const {productId, deliveryOptionId} = element.dataset;
-      updateDeliveryOption(productId, deliveryOptionId);
-    })
-  });
-
 // helper function: calculate the date?
+
+renderOrderSummary();
 
