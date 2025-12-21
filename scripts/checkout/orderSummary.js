@@ -7,11 +7,10 @@ import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 // we'd prefer esm version to avoid naming conflicts
 // use DayJS external library to handle delivery options.(always been minification for smaller data size)
 import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
+import { renderPaymentSummary } from './paymentSummary.js';
+
 
 export function renderOrderSummary() {
-
-
-
   let cartSummaryHTML = '';
 
   cart.forEach(cartItem => {
@@ -117,6 +116,8 @@ export function renderOrderSummary() {
         // get the container that need to be deleted via id, then remove.
         const container = document.querySelector(`.js-cart-item-container-${productId}`);
         container.remove();
+        renderPaymentSummary();
+        // MVC model -> view -> controller!
       })
     });
 
@@ -129,6 +130,7 @@ export function renderOrderSummary() {
         const { productId, deliveryOptionId } = element.dataset;
         updateDeliveryOption(productId, deliveryOptionId);
         renderOrderSummary();
+        renderPaymentSummary();
       })
     });
 }
