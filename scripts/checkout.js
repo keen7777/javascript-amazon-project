@@ -1,4 +1,4 @@
-import { cart, removeFromCart } from '../data/cart.js';
+import { cart, removeFromCart , updateDeliveryOption} from '../data/cart.js';
 import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js'
 import { hello } from 'https://unpkg.com/supersimpledev@1.0.1/hello.esm.js';
@@ -21,6 +21,8 @@ cart.forEach(cartItem => {
   });
 
 
+  // 从配送方式列表中，找到当前商品已选择的那一种
+  // 从cartItem的id里面找具体的价钱和日期，完整的option（相当于是嵌套）
   const deliveryOptionId = cartItem.deliveryOptionId;
   let deliveryOption;
   deliveryOptions.forEach((option) => {
@@ -70,9 +72,7 @@ cart.forEach(cartItem => {
                 <div class="delivery-options-title">
                   Choose a delivery option:
                 </div>
-                ${deliveryOptionsHTML(matchingProduct)}
-                
-                
+                ${deliveryOptionsHTML(matchingProduct, cartItem)}                            
               </div>
             </div>
           </div>
@@ -80,12 +80,12 @@ cart.forEach(cartItem => {
 });
 
 // function to create delivery Html
+// 给某一个商品，生成它的全部配送方式，并自动勾选当前选择的那一个
 function deliveryOptionsHTML(matchingProduct, cartItem) {
   let html = '';
 
   deliveryOptions.forEach((deliveryOption) => {
-    const today = dayjs();
-    const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
+    const deliveryDate = dayjs().add(deliveryOption.deliveryDays, 'days');
     const dateString = deliveryDate.format('dddd, MMMM D');
     // if 0, then Free shipping else show price
     const priceString = deliveryOption.priceCents === 0
@@ -95,14 +95,17 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
     const isChecked = deliveryOption.id === cartItem.deliveryOptionId
     // concat html here
     html +=
-      `<div class="delivery-option">
+      `<div class="delivery-option js-delivery-option"
+        data-product-id="${matchingProduct.id}"
+        data-delivery-option-id="${deliveryOption.id}">
       <input 
       type="radio" 
+      ${isChecked ? 'checked' : ''}
       class="delivery-option-input" 
       name="delivery-option-${matchingProduct.id}">
       <div>
         <div class="delivery-option-date"> ${dateString} </div>
-        <div class="delivery-option-price">${priceString}  </div>
+        <div class="delivery-option-price">${priceString} </div>
       </div>
     </div>
     `;
@@ -112,6 +115,7 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
 
 document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
 
+//delete logic
 document.querySelectorAll('.js-delete-link')
   .forEach(link => {
     link.addEventListener('click', () => {
@@ -121,8 +125,18 @@ document.querySelectorAll('.js-delete-link')
       const container = document.querySelector(`.js-cart-item-container-${productId}`);
       container.remove();
     })
-
   });
 
+// update delivery logic:
+
+document.querySelectorAll('.js-delivery-option')
+  .forEach((element) => {
+    element.addEventListener('click', () => {
+      // shorthand property
+      const {productId, deliveryOptionId} = element.dataset;
+      updateDeliveryOption(productId, deliveryOptionId);
+    })
+  });
 
 // helper function: calculate the date?
+
