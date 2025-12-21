@@ -1,12 +1,12 @@
 import { cart, removeFromCart, updateDeliveryOption } from '../../data/cart.js';
-import { products } from '../../data/products.js';
+import { products, getProduct } from '../../data/products.js';
 import { formatCurrency } from '../utils/money.js'
 // dayjs is the default export, only one default for each file
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 // load from external library:always load them first before your own code
 // we'd prefer esm version to avoid naming conflicts
 // use DayJS external library to handle delivery options.(always been minification for smaller data size)
-import { deliveryOptions } from '../../data/deliveryOptions.js';
+import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
 
 export function renderOrderSummary() {
 
@@ -16,23 +16,13 @@ export function renderOrderSummary() {
 
   cart.forEach(cartItem => {
     const productId = cartItem.productId;
-    let matchingProduct;
-    products.forEach(product => {
-      if (product.id === productId) {
-        matchingProduct = product;
-      }
-    });
+    const matchingProduct = getProduct(productId);
 
 
     // 从配送方式列表中，找到当前商品已选择的那一种
     // 从cartItem的id里面找具体的价钱和日期，完整的option（相当于是嵌套）
     const deliveryOptionId = cartItem.deliveryOptionId;
-    let deliveryOption;
-    deliveryOptions.forEach((option) => {
-      if (option.id === deliveryOptionId) {
-        deliveryOption = option;
-      }
-    });
+    const deliveryOption = getDeliveryOption(deliveryOptionId);
 
     const today = dayjs();
     const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
