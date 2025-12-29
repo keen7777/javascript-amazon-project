@@ -9,6 +9,10 @@ import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
 import { renderPaymentSummary } from './paymentSummary.js';
 
+// from 14 import
+import { calculateCartQuantity, handleUpdateQuantity } from '../../data/cart.js'
+import { updateCartQuantityDisplay, showInputSaveButton, removeInputSaveButton } from "../../ui/modifyCart.js";
+
 
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
@@ -30,7 +34,8 @@ export function renderOrderSummary() {
     // console.log(matchingProduct);
     cartSummaryHTML = cartSummaryHTML +
       `
-        <div class="cart-item-container js-cart-item-container-${matchingProduct.id}">
+        <div class="cart-item-container js-cart-item-container-${matchingProduct.id}"
+          data-product-id="${matchingProduct.id}">
             <div class="delivery-date">
               Delivery date: ${dateString}
             </div>
@@ -50,9 +55,13 @@ export function renderOrderSummary() {
                   <span>
                     Quantity: <span class="quantity-label">${cartItem.quantity}</span>
                   </span>
-                  <span class="update-quantity-link link-primary">
+                  <span class="update-quantity-link link-primary js-update-link"
+                    data-product-id="${matchingProduct.id}">
                     Update
                   </span>
+                  <input class="quantity-input">
+                  <span class="save-quantity-link link-primary js-save-link"
+                    data-product-id="${matchingProduct.id}">Save</span>
                   <span class="delete-quantity-link link-primary js-delete-link"
                     data-product-id="${matchingProduct.id}">
                     Delete
@@ -106,6 +115,10 @@ export function renderOrderSummary() {
   }
 
   document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
+  // from 14++++++++++++++++++++
+  const quantity = calculateCartQuantity(cart);
+  updateCartQuantityDisplay(quantity);
+  // end from 14 +++++++++++++++++++
 
   //delete logic
   document.querySelectorAll('.js-delete-link')
@@ -135,6 +148,106 @@ export function renderOrderSummary() {
     });
 }
 // helper function: calculate the date?
+// +++++++++++++++++++++++++++++++++++++++++++++++++++from 14 exercise:
+// use Event Delegation, bubbling
+// click logic
+document.querySelector('.js-order-summary').addEventListener('click', (e) => {
+  const deleteLink = e.target.closest('.js-delete-link');
+  // delete link logic
+  if (deleteLink) {
+    const productId = deleteLink.dataset.productId;
+    removeFromCart(productId);
+    const container = document.querySelector(`[data-product-id="${productId}"]`);
+    if (container) container.remove();
+
+    const cartQuantity = calculateCartQuantity(cart);
+    updateCartQuantityDisplay(cartQuantity);
+    return; // 
+  }
 
 
+  // exercise 14 challenge, f- : update link logic
+  const updateLink = e.target.closest('.js-update-link');
+  if (updateLink) {
+    const productId = updateLink.dataset.productId;
+    showInputSaveButton(productId);
 
+    const container = document.querySelector(`[data-product-id="${productId}"]`);
+    const labelValue = container.querySelector('.quantity-label').textContent;
+    // show current amount before user doing modification
+    container.querySelector('.quantity-input').value = labelValue;
+    return;
+  }
+
+
+  //exercise 14 challenge, i, save button disappear
+  const saveLink = e.target.closest('.js-save-link');
+  if (saveLink) {
+    const productId = saveLink.dataset.productId;
+    saveQuantity(productId);
+  }
+});
+
+//keylogic:
+document.addEventListener('keydown', (e) => {
+  const container = getEditingProductContainer();
+  if (!container) return;
+  // 只在 input 中拦截
+  if (e.target.matches('.quantity-input')) {
+    if (['Enter', 'Escape'].includes(e.key)) {
+      e.preventDefault();
+    }
+  }
+
+  switch (e.key) {
+    case 'Escape': {
+      // 取消编辑
+      const productId = container.dataset.productId;
+      removeInputSaveButton(productId);
+      break;
+    }
+
+    case 'Enter': {
+      // Enter保存
+      const saveLink = container.querySelector('.js-save-link');
+      if (saveLink) saveLink.click();
+      break;
+    }
+
+    default:
+      break;
+  }
+});
+
+
+//helper function, wrap save logic
+
+function saveQuantity(productId) {
+
+  // 调用更新数量的逻辑
+  const container = document.querySelector(`[data-product-id="${productId}"]`);
+  const inputValueString = container.querySelector('.quantity-input').value;
+  const savedUpdatedQuantity = handleUpdateQuantity(inputValueString, productId);
+
+  //local single item update:
+  container.querySelector('.quantity-label').textContent = savedUpdatedQuantity;
+
+  // 隐藏输入框和 Save 按钮
+  removeInputSaveButton(productId);
+
+  //standard update
+  const quantity = calculateCartQuantity(cart);
+  updateCartQuantityDisplay(quantity);
+  renderPaymentSummary();
+  return;
+}
+
+function getEditingProductContainer() {
+  return document.querySelector('.is-editing-quantity');
+}
+
+//Escape 只负责“退出状态”，不负责“修正数据”
+
+// Save / Enter → 处理数据
+// Update → 初始化 input
+// Escape → 纯 UI 状态切换
