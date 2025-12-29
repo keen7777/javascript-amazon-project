@@ -209,3 +209,8 @@ function getEditingProductContainer() {
 // Save / Enter → 处理数据
 // Update → 初始化 input
 // Escape → 纯 UI 状态切换
+import {renderOrderSummary} from './checkout/orderSummary.js'
+import { renderPaymentSummary } from './checkout/paymentSummary.js';
+
+renderOrderSummary();
+renderPaymentSummary();
