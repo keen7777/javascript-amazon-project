@@ -52,7 +52,7 @@ export function addToCart(productId) {
     } else {
         cart.push({
             productId: productId,
-            quantity: 1,
+            quantity: Number(productAddQuantity),
             deliveryOptionId: '1'
         })
     }

@@ -115,38 +115,12 @@ export function renderOrderSummary() {
   }
 
   document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
-  // from 14++++++++++++++++++++
+  // put quantity update here:
   const quantity = calculateCartQuantity(cart);
   updateCartQuantityDisplay(quantity);
-  // end from 14 +++++++++++++++++++
-
-  //delete logic
-  document.querySelectorAll('.js-delete-link')
-    .forEach(link => {
-      link.addEventListener('click', () => {
-        const productId = link.dataset.productId;
-        removeFromCart(productId);
-        // get the container that need to be deleted via id, then remove.
-        const container = document.querySelector(`.js-cart-item-container-${productId}`);
-        container.remove();
-        renderPaymentSummary();
-        // MVC model -> view -> controller!
-      })
-    });
-
-  // update delivery logic:
-
-  document.querySelectorAll('.js-delivery-option')
-    .forEach((element) => {
-      element.addEventListener('click', () => {
-        // shorthand property
-        const { productId, deliveryOptionId } = element.dataset;
-        updateDeliveryOption(productId, deliveryOptionId);
-        renderOrderSummary();
-        renderPaymentSummary();
-      })
-    });
 }
+
+
 // helper function: calculate the date?
 // +++++++++++++++++++++++++++++++++++++++++++++++++++from 14 exercise:
 // use Event Delegation, bubbling
@@ -157,16 +131,11 @@ document.querySelector('.js-order-summary').addEventListener('click', (e) => {
   if (deleteLink) {
     const productId = deleteLink.dataset.productId;
     removeFromCart(productId);
-    const container = document.querySelector(`[data-product-id="${productId}"]`);
-    if (container) container.remove();
-
-    const cartQuantity = calculateCartQuantity(cart);
-    updateCartQuantityDisplay(cartQuantity);
+    rerender();
     return; // 
   }
 
-
-  // exercise 14 challenge, f- : update link logic
+  // E14 challenge, f- : update link logic
   const updateLink = e.target.closest('.js-update-link');
   if (updateLink) {
     const productId = updateLink.dataset.productId;
@@ -180,12 +149,23 @@ document.querySelector('.js-order-summary').addEventListener('click', (e) => {
   }
 
 
-  //exercise 14 challenge, i, save button disappear
+  // E14 challenge, i, save button disappear
   const saveLink = e.target.closest('.js-save-link');
   if (saveLink) {
     const productId = saveLink.dataset.productId;
     saveQuantity(productId);
+    return;
   }
+
+
+  // delivery（修改配送方式） 和 delete 是「平行」的
+    const deliveryOption = e.target.closest('.js-delivery-option');
+    if (deliveryOption) {
+      const { productId, deliveryOptionId } = deliveryOption.dataset;
+      updateDeliveryOption(productId, deliveryOptionId);
+      rerender();
+      return;
+    }
 });
 
 //keylogic:
@@ -227,18 +207,10 @@ function saveQuantity(productId) {
   // 调用更新数量的逻辑
   const container = document.querySelector(`[data-product-id="${productId}"]`);
   const inputValueString = container.querySelector('.quantity-input').value;
-  const savedUpdatedQuantity = handleUpdateQuantity(inputValueString, productId);
+  handleUpdateQuantity(inputValueString, productId);
 
-  //local single item update:
-  container.querySelector('.quantity-label').textContent = savedUpdatedQuantity;
-
-  // 隐藏输入框和 Save 按钮
-  removeInputSaveButton(productId);
-
-  //standard update
-  const quantity = calculateCartQuantity(cart);
-  updateCartQuantityDisplay(quantity);
-  renderPaymentSummary();
+  // rendering as a whole page, not local item.
+  rerender();
   return;
 }
 
@@ -251,3 +223,13 @@ function getEditingProductContainer() {
 // Save / Enter → 处理数据
 // Update → 初始化 input
 // Escape → 纯 UI 状态切换
+
+// helper function for re-render everything on checkout page:
+function rerender() {
+  renderOrderSummary();
+  renderPaymentSummary();
+
+  const quantity = calculateCartQuantity(cart);
+  updateCartQuantityDisplay(quantity);
+}
+
