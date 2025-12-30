@@ -8,6 +8,7 @@ import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 // use DayJS external library to handle delivery options.(always been minification for smaller data size)
 import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
 import { renderPaymentSummary } from './paymentSummary.js';
+import { renderCheckoutHeader } from './checkoutHeader.js';
 
 // from 14 import
 import { calculateCartQuantity, handleUpdateQuantity } from '../../data/cart.js'
@@ -116,8 +117,7 @@ export function renderOrderSummary() {
 
   document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
   // put quantity update here:
-  const quantity = calculateCartQuantity(cart);
-  updateCartQuantityDisplay(quantity);
+  renderCheckoutHeader();
 }
 
 
@@ -218,8 +218,7 @@ function getEditingProductContainer() {
   return document.querySelector('.is-editing-quantity');
 }
 
-//Escape 只负责“退出状态”，不负责“修正数据”
-
+// Escape 只负责“退出状态”，不负责“修正数据”
 // Save / Enter → 处理数据
 // Update → 初始化 input
 // Escape → 纯 UI 状态切换
@@ -228,8 +227,6 @@ function getEditingProductContainer() {
 function rerender() {
   renderOrderSummary();
   renderPaymentSummary();
-
-  const quantity = calculateCartQuantity(cart);
-  updateCartQuantityDisplay(quantity);
+  renderCheckoutHeader();
 }
 
