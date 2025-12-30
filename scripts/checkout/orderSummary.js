@@ -6,31 +6,27 @@ import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 // load from external library:always load them first before your own code
 // we'd prefer esm version to avoid naming conflicts
 // use DayJS external library to handle delivery options.(always been minification for smaller data size)
-import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
+import { deliveryOptions, getDeliveryOption, calculateDeliveryDate } from '../../data/deliveryOptions.js';
 import { renderPaymentSummary } from './paymentSummary.js';
 import { renderCheckoutHeader } from './checkoutHeader.js';
 
 // from 14 import
-import { calculateCartQuantity, handleUpdateQuantity } from '../../data/cart.js'
-import { updateCartQuantityDisplay, showInputSaveButton, removeInputSaveButton } from "../../ui/modifyCart.js";
+import { handleUpdateQuantity } from '../../data/cart.js'
+import { showInputSaveButton, removeInputSaveButton } from "../../ui/modifyCart.js";
 
 
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
-
   cart.forEach(cartItem => {
     const productId = cartItem.productId;
     const matchingProduct = getProduct(productId);
 
-
     // 从配送方式列表中，找到当前商品已选择的那一种
     // 从cartItem的id里面找具体的价钱和日期，完整的option（相当于是嵌套）
+    // abstract it as a function in deliveryoptions.js
     const deliveryOptionId = cartItem.deliveryOptionId;
     const deliveryOption = getDeliveryOption(deliveryOptionId);
-
-    const today = dayjs();
-    const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
-    const dateString = deliveryDate.format('dddd, MMMM D');
+    const dateString = calculateDeliveryDate(deliveryOption);
 
     // console.log(matchingProduct);
     cartSummaryHTML = cartSummaryHTML +
@@ -87,12 +83,11 @@ export function renderOrderSummary() {
     let html = '';
 
     deliveryOptions.forEach((deliveryOption) => {
-      const deliveryDate = dayjs().add(deliveryOption.deliveryDays, 'days');
-      const dateString = deliveryDate.format('dddd, MMMM D');
+      const dateString = calculateDeliveryDate(deliveryOption);
       // if 0, then Free shipping else show price
       const priceString = deliveryOption.priceCents === 0
         ? 'FREE Shipping'
-        : `$${formatCurrency(deliveryOption.priceCents)}-Shipping`;
+        : `$${formatCurrency(deliveryOption.priceCents)} - Shipping`;
       //deal with choosing one of the delivery options:
       const isChecked = deliveryOption.id === cartItem.deliveryOptionId
       // concat html here
@@ -154,18 +149,20 @@ document.querySelector('.js-order-summary').addEventListener('click', (e) => {
   if (saveLink) {
     const productId = saveLink.dataset.productId;
     saveQuantity(productId);
+    // rendering as a whole page, not local item.
+    rerender();
     return;
   }
 
 
   // delivery（修改配送方式） 和 delete 是「平行」的
-    const deliveryOption = e.target.closest('.js-delivery-option');
-    if (deliveryOption) {
-      const { productId, deliveryOptionId } = deliveryOption.dataset;
-      updateDeliveryOption(productId, deliveryOptionId);
-      rerender();
-      return;
-    }
+  const deliveryOption = e.target.closest('.js-delivery-option');
+  if (deliveryOption) {
+    const { productId, deliveryOptionId } = deliveryOption.dataset;
+    updateDeliveryOption(productId, deliveryOptionId);
+    rerender();
+    return;
+  }
 });
 
 //keylogic:
@@ -203,14 +200,10 @@ document.addEventListener('keydown', (e) => {
 //helper function, wrap save logic
 
 function saveQuantity(productId) {
-
   // 调用更新数量的逻辑
   const container = document.querySelector(`[data-product-id="${productId}"]`);
   const inputValueString = container.querySelector('.quantity-input').value;
   handleUpdateQuantity(inputValueString, productId);
-
-  // rendering as a whole page, not local item.
-  rerender();
   return;
 }
 
