@@ -15,7 +15,7 @@ import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
-loadCart();
+//loadCart();
 let productsHTML = '';
 // loop through the product array and create single product's html
 products.forEach((product) => {
@@ -90,12 +90,6 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
   button.addEventListener('click', () => {
     const { productId } = button.dataset;
 
-<<<<<<< HEAD
-        addToCart(productId);
-        updateCartQuantity();
-    });
-});
-=======
     addToCart(productId);
 
     const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
@@ -118,4 +112,3 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
   });
 });
 
->>>>>>> exercise
