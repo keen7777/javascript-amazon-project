@@ -15,7 +15,7 @@ import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
-//loadCart();
+loadCart();
 let productsHTML = '';
 // loop through the product array and create single product's html
 products.forEach((product) => {
