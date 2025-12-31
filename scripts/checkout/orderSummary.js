@@ -1,4 +1,4 @@
-import { cart, removeFromCart, updateDeliveryOption } from '../../data/cart.js';
+import { cart, removeFromCart, updateDeliveryOption, loadCart } from '../../data/cart.js';
 import { products, getProduct } from '../../data/products.js';
 import { formatCurrency } from '../utils/money.js'
 // dayjs is the default export, only one default for each file
@@ -10,6 +10,7 @@ import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.j
 import { renderPaymentSummary } from './paymentSummary.js';
 
 
+loadCart();
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
 

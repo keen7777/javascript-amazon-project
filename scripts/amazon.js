@@ -10,9 +10,10 @@
 // import {cart as myCart} from '../data/cart.js';
 // import * as cartModule from '../data/cart.js';
 
-import { cart, addToCart } from '../data/cart.js';
+import { cart, addToCart, loadCart } from '../data/cart.js';
 import { products } from '../data/products.js';
 import {formatCurrency} from './utils/money.js'
+loadCart();
 /*
 const products = [
     {
@@ -116,8 +117,5 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
 
         addToCart(productId);
         updateCartQuantity();
-
-        
-
     });
 });
