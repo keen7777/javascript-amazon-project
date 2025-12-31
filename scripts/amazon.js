@@ -10,38 +10,17 @@
 // import {cart as myCart} from '../data/cart.js';
 // import * as cartModule from '../data/cart.js';
 
-import { cart, addToCart, loadCart } from '../data/cart.js';
+import { cart, addToCart, calculateCartQuantity,loadCart } from '../data/cart.js';
 import { products } from '../data/products.js';
-import {formatCurrency} from './utils/money.js'
-loadCart();
-/*
-const products = [
-    {
-        //1st
-        image: 'images/products/athletic-cotton-socks-6-pairs.jpg',
-        name: 'Black and Gray Athletic Cotton Socks - 6 Pairs',
-        rating: {
-            stars: 4.5,
-            count: 87
-        },
-        priceCents: 1090
-    }, {
-        //2nd
-        image: 'images/products/intermediate-composite-basketball.jpg',
-        name: 'Intermediate Size Basketball',
-        rating: {
-            stars: 4,
-            count: 127
-        },
-        priceCents: 2095
+import { formatCurrency } from './utils/money.js';
+import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
-    }];
-*/
+loadCart();
 let productsHTML = '';
 // loop through the product array and create single product's html
 products.forEach((product) => {
-    // accumulator Pattern
-    productsHTML = productsHTML + `
+  // accumulator Pattern
+  productsHTML = productsHTML + `
         <div class="product-container">
           <div class="product-image-container">
             <img class="product-image"
@@ -65,7 +44,7 @@ products.forEach((product) => {
           </div>
 
           <div class="product-quantity-container">
-            <select>
+            <select class="js-quantity-selector-${product.id}">
               <option selected value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -81,7 +60,7 @@ products.forEach((product) => {
 
           <div class="product-spacer"></div>
 
-          <div class="added-to-cart ">
+          <div class="added-to-cart js-added-to-cart-${product.id}">
             <img src="images/icons/checkmark.png">
             Added
           </div>
@@ -94,28 +73,49 @@ products.forEach((product) => {
 
 console.log(productsHTML);
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
+// update UI and calculate current item amount:
+const quantity = calculateCartQuantity(cart);
+updateCartQuantityDisplay(quantity);
 
-function updateCartQuantity() {
-    // total quantity of the cart:
-        let cartQuantity = 0;
-        cart.forEach((cartItem) => {
-            cartQuantity = cartQuantity + cartItem.quantity;
-        });
-        // console.log(cartQuantity);
 
-        // put it on html
-        // bc we modify html here to this function stays inside amazon.js
-        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
-    
-}
-// interaction of add to cart button
+// exercise 13 challenge
+let addedMessageTimeoutId;
+
+
+
+// interaction of add to cart button，debug, refresh the exactly timeout, not the previous one. 
+const addedMessageTimeouts = {}; // store timeout per product
+
 document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
-    button.addEventListener('click', () => {
-        const productId = button.dataset.productId;
-        // kabab -> caml case when we want to use "data-"
-        // console.log(`everything working! ${productName}`);
+  button.addEventListener('click', () => {
+    const { productId } = button.dataset;
 
+<<<<<<< HEAD
         addToCart(productId);
         updateCartQuantity();
     });
 });
+=======
+    addToCart(productId);
+
+    const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
+    addToCartSelector.classList.add('added-to-cart-seen');
+
+    // clear previous timeout for this product only
+    if (addedMessageTimeouts[productId]) {
+      clearTimeout(addedMessageTimeouts[productId]);
+    }
+
+    // set new timeout for this product
+    addedMessageTimeouts[productId] = setTimeout(() => {
+      addToCartSelector.classList.remove('added-to-cart-seen');
+      delete addedMessageTimeouts[productId]; // clean up
+    }, 2000);
+
+    // update total cart quantity
+    const quantity = calculateCartQuantity(cart);
+    updateCartQuantityDisplay(quantity);
+  });
+});
+
+>>>>>>> exercise

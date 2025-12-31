@@ -56,26 +56,30 @@ function loadFromStorage(str) {
 export function addToCart(productId) {
     // check if this product already in the cart, if exist then quantity +1, else push an new object.
     // remember to loop through and then find out if the whole cart exist such a particular product. 
+
     let matchingItem;
-    cart.forEach((cartItem) => {
-        if (productId === cartItem.productId) {
-            matchingItem = cartItem;
+    cart.forEach((item) => {
+        if (productId === item.productId) {
+            matchingItem = item;
         }
     });
+
+    //exercise 13 a-f, selector for quantity number
+    const quantitySelector = document.querySelector(`.js-quantity-selector-${productId}`);
+    const productAddQuantity = quantitySelector.value;
 
     // truthy/falsy value to check if there is a matching exist.
     // we prefer using id to distinguish different items.
     if (matchingItem) {
-        matchingItem.quantity += 1;
+        matchingItem.quantity += Number(productAddQuantity);
     } else {
         cart.push({
             productId: productId,
-            quantity: 1,
+            quantity: Number(productAddQuantity),
             deliveryOptionId: '1'
         })
-        // console.log(cart);
-        saveToStorage();
     }
+    saveToStorage();
 }
 
 export function removeFromCart(productId) {
@@ -89,6 +93,43 @@ export function removeFromCart(productId) {
     saveToStorage();
 }
 
+
+// exercise 14: a-c, update the items number in checkout item(???)
+// helper function: -------------------------------------------
+export function calculateCartQuantity(cart) {
+    // total quantity of the cart:
+    let cartQuantity = 0;
+    cart.forEach((cartItem) => {
+        cartQuantity = cartQuantity + cartItem.quantity;
+    });
+    return cartQuantity;
+    // just to make it identical with tutorial.
+}
+
+// exercise 14: k, update the items number using Update button in the cart(???)
+export function handleUpdateQuantity(inputString, productId) {
+    const newQuantity = Number(inputString);
+
+    cart.forEach(cartItem => {
+        if (cartItem.productId !== productId) return;
+
+        if (
+            Number.isNaN(newQuantity) ||
+            newQuantity < 0 ||
+            newQuantity > 1000
+        ) {
+            alert('Quantity must be between 0 and 1000');
+            return; // 什么都不改
+        }
+
+        cartItem.quantity = newQuantity;
+    });
+
+    saveToStorage();
+    return newQuantity;
+}
+
+// helper functions ends-------------------------------------------
 export function updateDeliveryOption(productId, deliveryOptionId) {
     let matchingItem;
     cart.forEach((cartItem) => {
