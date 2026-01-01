@@ -4,6 +4,7 @@
 // jasmine explosion!!!!!!!!
 /*
 //  export let cart = loadFromStorage('cart');
+
 export let cart = JSON.parse(localStorage.getItem('cart'));
 if (!cart) {
     cart = [{
@@ -17,7 +18,7 @@ if (!cart) {
     }];
 }
 */
-export let cart = [];
+export let cart;
 
 // 专门负责初始化
 export function loadCart() {
@@ -66,7 +67,8 @@ export function addToCart(productId) {
 
     //exercise 13 a-f, selector for quantity number
     const quantitySelector = document.querySelector(`.js-quantity-selector-${productId}`);
-    const productAddQuantity = quantitySelector.value;
+    // L16 for testing, set default quantity =1
+    const productAddQuantity = quantitySelector ? Number(quantitySelector.value) : 1;
 
     // truthy/falsy value to check if there is a matching exist.
     // we prefer using id to distinguish different items.
