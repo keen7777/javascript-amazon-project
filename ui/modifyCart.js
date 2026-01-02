@@ -1,3 +1,5 @@
+import { cart } from "../data/cart.js";
+
 // ui/modifyCart.js
 export function updateCartQuantityDisplay(quantity) {
   const elements = document.querySelectorAll(
@@ -11,13 +13,15 @@ export function updateCartQuantityDisplay(quantity) {
 
 
 // 
-export function showInputSaveButton(productId){
-    const productSelector = document.querySelector(`.js-cart-item-container-${productId}`);
-    productSelector.classList.add('is-editing-quantity');
+export function showInputSaveButton(productId) {
+  const item = cart.find(i => i.productId === productId);
+  if (!item) return;
+  item.isEditing = true;
 }
 
 // 
-export function removeInputSaveButton(productId){
-    const productSelector = document.querySelector(`.js-cart-item-container-${productId}`);
-    productSelector.classList.remove('is-editing-quantity');
+export function removeInputSaveButton(productId) {
+  const item = cart.find(i => i.productId === productId);
+  if (!item) return;
+  item.isEditing = false;
 }

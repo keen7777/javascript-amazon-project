@@ -14,13 +14,37 @@ import { renderCheckoutHeader } from './checkoutHeader.js';
 import { handleUpdateQuantity } from '../../data/cart.js'
 import { showInputSaveButton, removeInputSaveButton } from "../../ui/modifyCart.js";
 
-
-loadCart();
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
   cart.forEach(cartItem => {
     const productId = cartItem.productId;
     const matchingProduct = getProduct(productId);
+
+    // 首先单独算一个quantity的小html，看是否在编辑ing，取消用dom直接更改的操作
+    const quantityHTML = cartItem.isEditing
+      ? `
+      <input 
+        class="quantity-input"
+        value="${cartItem.quantity}"
+      >
+      <span
+        class="save-quantity-link link-primary js-save-link"
+        data-product-id="${matchingProduct.id}">
+        Save
+      </span>
+    `
+      : `
+      <span>
+        Quantity:
+        <span class="quantity-label">${cartItem.quantity}</span>
+      </span>
+      <span
+        class="update-quantity-link link-primary js-update-link"
+        data-product-id="${matchingProduct.id}">
+        Update
+      </span>
+    `;
+
 
     // 从配送方式列表中，找到当前商品已选择的那一种
     // 从cartItem的id里面找具体的价钱和日期，完整的option（相当于是嵌套）
@@ -49,22 +73,16 @@ export function renderOrderSummary() {
                 <div class="product-price">
                   $${formatCurrency(matchingProduct.priceCents)}
                 </div>
+
                 <div class="product-quantity">
-                  <span>
-                    Quantity: <span class="quantity-label">${cartItem.quantity}</span>
-                  </span>
-                  <span class="update-quantity-link link-primary js-update-link"
-                    data-product-id="${matchingProduct.id}">
-                    Update
-                  </span>
-                  <input class="quantity-input">
-                  <span class="save-quantity-link link-primary js-save-link"
-                    data-product-id="${matchingProduct.id}">Save</span>
-                  <span class="delete-quantity-link link-primary js-delete-link"
+                  ${quantityHTML}
+                  <span
+                    class="delete-quantity-link link-primary js-delete-link"
                     data-product-id="${matchingProduct.id}">
                     Delete
                   </span>
                 </div>
+
               </div>
 
               <div class="delivery-options">
@@ -121,81 +139,88 @@ export function renderOrderSummary() {
 // +++++++++++++++++++++++++++++++++++++++++++++++++++from 14 exercise:
 // use Event Delegation, bubbling
 // click logic
-document.querySelector('.js-order-summary').addEventListener('click', (e) => {
-  const deleteLink = e.target.closest('.js-delete-link');
-  // delete link logic
-  if (deleteLink) {
-    const productId = deleteLink.dataset.productId;
-    removeFromCart(productId);
-    rerender();
-    return; // 
-  }
 
-  // E14 challenge, f- : update link logic
-  const updateLink = e.target.closest('.js-update-link');
-  if (updateLink) {
-    const productId = updateLink.dataset.productId;
-    showInputSaveButton(productId);
+// !!!!!!!!!wraping into a function so that the loading order is ok for the test.
+export function initOrderSummary() {
+  const container = document.querySelector('.js-order-summary');
+  if (!container) return;
 
-    const container = document.querySelector(`[data-product-id="${productId}"]`);
-    const labelValue = container.querySelector('.quantity-label').textContent;
-    // show current amount before user doing modification
-    container.querySelector('.quantity-input').value = labelValue;
-    return;
-  }
+  container.addEventListener('click', (e) => {
+    const deleteLink = e.target.closest('.js-delete-link');
+    // delete link logic
+    if (deleteLink) {
+      const productId = deleteLink.dataset.productId;
+      removeFromCart(productId);
+      rerender();
+      return; // 
+    }
 
-
-  // E14 challenge, i, save button disappear
-  const saveLink = e.target.closest('.js-save-link');
-  if (saveLink) {
-    const productId = saveLink.dataset.productId;
-    saveQuantity(productId);
-    // rendering as a whole page, not local item.
-    rerender();
-    return;
-  }
+    // E14 challenge, f- : update link logic
+    const updateLink = e.target.closest('.js-update-link');
+    if (updateLink) {
+      const productId = updateLink.dataset.productId;
+      showInputSaveButton(productId);
+      rerender();
+      return;
+    }
 
 
-  // delivery（修改配送方式） 和 delete 是「平行」的
-  const deliveryOption = e.target.closest('.js-delivery-option');
-  if (deliveryOption) {
-    const { productId, deliveryOptionId } = deliveryOption.dataset;
-    updateDeliveryOption(productId, deliveryOptionId);
-    rerender();
-    return;
-  }
-});
+    // E14 challenge, i, save button disappear
+    const saveLink = e.target.closest('.js-save-link');
+    if (saveLink) {
+      const productId = saveLink.dataset.productId;
+      saveQuantity(productId);
+      // rendering as a whole page, not local item.
+      removeInputSaveButton(productId); // 取消编辑状态
+      rerender();
+      rerender();
+      return;
+    }
+
+
+    // delivery（修改配送方式） 和 delete 是「平行」的
+    const deliveryOption = e.target.closest('.js-delivery-option');
+    if (deliveryOption) {
+      const { productId, deliveryOptionId } = deliveryOption.dataset;
+      updateDeliveryOption(productId, deliveryOptionId);
+      rerender();
+      return;
+    }
+  });
+
+  //key wraping function:
+  document.addEventListener('keydown', handleQuantityKeydown);
+
+}
+
 
 //keylogic:
-document.addEventListener('keydown', (e) => {
+// !!!!!!!!!wraping into a function so that the loading order is ok for the test.
+function handleQuantityKeydown(e) {
   const container = getEditingProductContainer();
   if (!container) return;
-  // 只在 input 中拦截
+
   if (e.target.matches('.quantity-input')) {
     if (['Enter', 'Escape'].includes(e.key)) {
       e.preventDefault();
     }
   }
 
-  switch (e.key) {
-    case 'Escape': {
-      // 取消编辑
-      const productId = container.dataset.productId;
-      removeInputSaveButton(productId);
-      break;
-    }
+  const productId = container.closest('.cart-item-container').dataset.productId;
 
-    case 'Enter': {
-      // Enter保存
+  switch (e.key) {
+    case 'Escape':
+      removeInputSaveButton(productId);
+      rerender();
+      break;
+
+    case 'Enter':
       const saveLink = container.querySelector('.js-save-link');
       if (saveLink) saveLink.click();
       break;
-    }
-
-    default:
-      break;
   }
-});
+}
+
 
 
 //helper function, wrap save logic
@@ -209,7 +234,7 @@ function saveQuantity(productId) {
 }
 
 function getEditingProductContainer() {
-  return document.querySelector('.is-editing-quantity');
+  return document.querySelector('.quantity-input:focus')?.closest('.product-quantity');
 }
 
 // Escape 只负责“退出状态”，不负责“修正数据”
