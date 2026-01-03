@@ -1,4 +1,4 @@
-import { addToCart, cart, loadCart } from "../../data/cart.js";
+import { addToCart, cart, loadCart, removeFromCart } from "../../data/cart.js";
 // remember the test coverage!, maximize it!
 // flaky test, have to deal with localstorage(clear or not)
 // using Mocks!
@@ -9,16 +9,31 @@ describe('test suite: addToCart', () => {
             return JSON.stringify([]);
         });
         loadCart(); // after mock, initialize localStorage to [];
-
-        spyOn(localStorage, 'setItem'); // so that addtocart won't affect local storage.
+        // e16e: pre-adding a puppy, which function calls won't counted in test cases.
+        spyOn(localStorage, 'setItem').and.callFake(() => {
+            return JSON.stringify([{
+                productId: '0123',
+                quantity: 1,
+                deliveryOptionId: '1',
+                isEditing: false
+            }]);
+        }); // so that addtocart won't affect local storage.
     });
 
     afterEach(() => {
-
+        localStorage.clear();
     });
 
     it('adds new item if it does not exist in cart', () => {
+
         addToCart('0123'); // first add
+        // e16c-d: check if setItem called with the puppy:
+        expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([{
+            productId: '0123',
+            quantity: 1,
+            deliveryOptionId: '1',
+            isEditing: false
+        }]));
         addToCart('e43638ce-6aa0-4b85-b27f-e1d07eb678c6'); // add different item
 
         expect(cart.length).toEqual(2);
@@ -52,6 +67,44 @@ describe('test suite: addToCart', () => {
         expect(localStorage.setItem).toHaveBeenCalledTimes(1);
     });
 
+}); //end of add to cart tests
 
+describe('test suite: removeFromCart', () => {
+    beforeEach(() => {
+        spyOn(localStorage, 'setItem');
+        // e16 i: pre-adding a puppy, which function calls won't counted in test cases.
+        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify([{
+            productId: '0123',
+            quantity: 2,
+            deliveryOptionId: '1',
+            isEditing: false
+        }])
+        );
+        loadCart();
+    });
+    afterEach(() => { });
+
+    it('remove a productId that is in the cart', () => {
+        // console.log(cart);
+        expect(cart.length).toBe(1);
+        removeFromCart('0123');
+        expect(cart.length).toBe(0);
+        expect(localStorage.setItem).toHaveBeenCalledTimes(1);
+        expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([]));
+    });
+
+    it('remove a productId that is not in the cart', () => {
+        // console.log(cart);
+        expect(cart.length).toBe(1);
+        removeFromCart('e43638ce-6aa0-4b85-b27f-e1d07eb678c6');
+        expect(cart.length).toBe(1);
+        expect(localStorage.setItem).toHaveBeenCalledTimes(1);
+        expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([{
+            productId: '0123',
+            quantity: 2,
+            deliveryOptionId: '1',
+            isEditing: false
+        }]));
+    });
 
 });
