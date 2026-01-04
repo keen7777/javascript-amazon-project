@@ -21,12 +21,14 @@ describe("test suite: renderOrderSummary, Integration Test", () => {
             return JSON.stringify([{
                 productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
                 quantity: 2,
-                deliveryOptionId: '1'
+                deliveryOptionId: '1',
+                isEditing: false
             },
             {
                 productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
                 quantity: 1,
-                deliveryOptionId: '2'
+                deliveryOptionId: '2',
+                isEditing: false
             }]);
         });
         loadCart();
@@ -36,7 +38,7 @@ describe("test suite: renderOrderSummary, Integration Test", () => {
 
     // e16f, clean up test container after each test
 
-    afterEach(() =>{
+    afterEach(() => {
         document.querySelector('.js-test-container').innerHTML = '';
     });
 
@@ -71,7 +73,62 @@ describe("test suite: renderOrderSummary, Integration Test", () => {
         //check after delete first element is product2:
         expect(cart.length).toEqual(1);
         expect(cart[0].productId).toEqual(productId2);
-
         // document.querySelector('.js-test-container').innerHTML = `finished`;
     });
+});
+
+describe('Integration test suite: delivery option', () => {
+    beforeEach(() => {
+        document.querySelector('.js-test-container').innerHTML = `
+    <div class="js-order-summary"></div>
+    <div class="js-payment-summary"></div>
+    <div class="js-checkout-header"></div>
+  `;
+        spyOn(localStorage, 'setItem');
+        // e16 i: pre-adding a puppy, which function calls won't counted in test cases.
+        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify([{
+            productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
+            quantity: 2,
+            deliveryOptionId: '1',
+            isEditing: false
+        },
+        {
+            productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
+            quantity: 1,
+            deliveryOptionId: '2',
+            isEditing: false
+        }])
+        );
+        loadCart();
+        renderOrderSummary();
+        initOrderSummary();
+    });
+    afterEach(() => {
+        document.querySelector('.js-test-container').innerHTML = '';
+     });
+    const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6'; // socks, 2 
+    const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d'; // basketball, 1
+
+    it('updates the delivery option from 1 to 3 for the socks (id1))', () => {
+        
+        // modify the delivery options:
+        document.querySelector(`.js-delivery-option-${productId1}-3`).click();
+
+        // adding corresponding js-class in order summary, but increase coupling. should use data-id thing constantly
+        expect(
+            document.querySelector(`.js-delivery-option-input-${productId1}-3`).checked
+        ).toEqual(true);
+
+        expect(cart.length).toEqual(2);
+        expect(cart[0].productId).toEqual(productId1);
+        expect(cart[0].deliveryOptionId).toEqual('3');
+
+        expect(
+            document.querySelector('.js-payment-summary-shipping').innerText
+        ).toEqual('$14.98');
+        expect(
+            document.querySelector('.js-payment-summary-total').innerText
+        ).toEqual('$63.50');
+    });
+
 });

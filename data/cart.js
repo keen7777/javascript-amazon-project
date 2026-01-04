@@ -22,22 +22,22 @@ export let cart;
 
 // 专门负责初始化
 export function loadCart() {
-  const storedCart = loadFromStorage('cart');
+    const storedCart = loadFromStorage('cart');
 
-  cart = storedCart ?? [
-    {
-      productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-      quantity: 2,
-      deliveryOptionId: '1',
-      isEditing: false
-    },
-    {
-      productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
-      quantity: 1,
-      deliveryOptionId: '2',
-      isEditing: false
-    }
-  ];
+    cart = storedCart ?? [
+        {
+            productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
+            quantity: 2,
+            deliveryOptionId: '1',
+            isEditing: false
+        },
+        {
+            productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
+            quantity: 1,
+            deliveryOptionId: '2',
+            isEditing: false
+        }
+    ];
 }
 
 
@@ -136,12 +136,22 @@ export function handleUpdateQuantity(inputString, productId) {
 
 // helper functions ends-------------------------------------------
 export function updateDeliveryOption(productId, deliveryOptionId) {
+    // checking illegal delivery option
+    if (!(deliveryOptionId === '1' || deliveryOptionId === '2' || deliveryOptionId === '3')) {
+        return;
+    }
     let matchingItem;
     cart.forEach((cartItem) => {
         if (productId === cartItem.productId) {
             matchingItem = cartItem;
         }
     });
-    matchingItem.deliveryOptionId = deliveryOptionId;
-    saveToStorage();
+
+    if (matchingItem === undefined) {
+        return;
+    } else {
+        matchingItem.deliveryOptionId = deliveryOptionId;
+        saveToStorage();
+    }
+
 }
