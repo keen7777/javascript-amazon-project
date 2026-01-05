@@ -1,10 +1,22 @@
-function Cart(localStorageKey) {
-    const cart = {
-    cartItems: undefined,
+class Cart {
+    // features that help us generate objects(represent the real world), 
+    // class has extra features for oop
+    // constructor as setup! 
 
-    // 专门负责初始化, oop using regular function(not arrow)
+    // same:
+    // cartItems = undefined;
+    // localStorageKey = undefined;
+    cartItems;
+    localStorageKey;
+
+    // name has to be constructor, and void, no return
+    constructor(localStorageKey) {   
+        this.localStorageKey = localStorageKey;
+        this.loadCart();
+    }
+
     loadCart() {
-        this.cartItems = this.loadFromStorage(localStorageKey);
+        this.cartItems = this.loadFromStorage(this.localStorageKey);
         this.cartItems = this.cartItems ?? [
             {
                 productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
@@ -19,16 +31,16 @@ function Cart(localStorageKey) {
                 isEditing: false
             }
         ];
-    },
+    }
 
     // local storage
     saveToStorage() {
-        localStorage.setItem(localStorageKey, JSON.stringify(this.cartItems));
-    },
+        localStorage.setItem(this.localStorageKey, JSON.stringify(this.cartItems));
+    }
 
     loadFromStorage(str) {
         return JSON.parse(localStorage.getItem(str));
-    },
+    }
 
     addToCart(productId) {
         // check if this product already in the cart, if exist then quantity +1, else push an new object.
@@ -59,7 +71,7 @@ function Cart(localStorageKey) {
             })
         }
         this.saveToStorage();
-    },
+    }
 
     removeFromCart(productId) {
         const newCart = [];
@@ -70,7 +82,7 @@ function Cart(localStorageKey) {
         });
         this.cartItems = newCart;
         this.saveToStorage();
-    },
+    }
 
     // exercise 14: a-c, update the items number in checkout item(???)
     // helper function: -------------------------------------------
@@ -82,7 +94,7 @@ function Cart(localStorageKey) {
         });
         return cartQuantity;
         // just to make it identical with tutorial.
-    },
+    }
 
     // exercise 14: k, update the items number using Update button in the cart(???)
     handleUpdateQuantity(inputString, productId) {
@@ -105,7 +117,7 @@ function Cart(localStorageKey) {
 
         this.saveToStorage();
         return newQuantity;
-    },
+    }
 
     // helper functions ends-------------------------------------------
     updateDeliveryOption(productId, deliveryOptionId) {
@@ -127,24 +139,30 @@ function Cart(localStorageKey) {
             this.saveToStorage();
         }
     }
-};
-return cart;
 }
-// for object oriented programming: organize code into objects
 
-const cart2 = Cart('cart-oop');
-const businessCart2 = Cart('cart-business');
+
+const cart2 = new Cart();
+const businessCart2 = new Cart();
+cart2.localStorageKey = 'cart-oops-class'
+businessCart2.localStorageKey = 'cart-business-class'
 
 cart2.loadCart();
 // check functions and log result as expected
+cart2.addToCart("54e0eccd-8f36-462b-b68a-8182611d9add");
 cart2.addToCart("0123");
 console.log(cart2);
 
+// use constuctor:
+const cart3 = new Cart('cart-constructor');
+console.log(cart3);
 
 // create multiple different cart via copy and paste, or a function; 
 // in PascalCase means it generate objects
 businessCart2.loadCart();
+businessCart2.addToCart("0123");
 console.log(businessCart2);
+console.log(businessCart2 instanceof Cart);
 
 
 
