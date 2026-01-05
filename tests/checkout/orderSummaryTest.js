@@ -1,7 +1,7 @@
 import { renderOrderSummary, initOrderSummary } from "../../scripts/checkout/orderSummary.js";
 import { addToCart, cart, loadCart } from "../../data/cart.js";
 
-describe("test suite: renderOrderSummary, Integration Test", () => {
+describe("Integration test suite: renderOrderSummary", () => {
     // test :
     // how the page looks,
     // how the page behaves; 

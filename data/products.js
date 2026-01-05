@@ -33,7 +33,54 @@ class Product {
   getPrice() {
     return `$${formatCurrency(this.priceCents)}`;
   }
+
+  extraInfoHTML(){
+    return ``;
+  }
 }
+
+// L17, inheritance for parent class and children class
+
+class Clothing extends Product {
+  sizeChartLink;
+  constructor(productDetails) {
+    // super is the constructor of parent class.(will run by default if leave it blank)
+    super(productDetails);
+    this.sizeChartLink = productDetails.sizeChartLink;
+  }
+
+  // override the parent's method
+  // On amazon page we use the method without knowing the class, Pilymorphism
+  extraInfoHTML(){
+    return `
+      <a href="${this.sizeChartLink}" target="_blank">
+        Size chart
+      </a>`;
+  }
+
+}
+/*
+const tshirt = new Clothing({
+  id: "83d4ca15-0f35-48f5-b7a3-1ea210004f2e",
+  image: "images/products/adults-plain-cotton-tshirt-2-pack-teal.jpg",
+  name: "Adults Plain Cotton T-Shirt - 2 Pack",
+  rating: {
+    stars: 4.5,
+    count: 56
+  },
+  priceCents: 799,
+  keywords: [
+    "tshirts",
+    "apparel",
+    "mens"
+  ],
+  type: "clothing",
+  sizeChartLink: "images/clothing-size-chart.png"
+});
+console.log(tshirt);
+console.log(tshirt.getPrice());
+*/
+
 
 /*
 // this is an illustration
@@ -731,7 +778,13 @@ export const products = [
     ]
   }
 ].map((productDetails) => {
-  return new Product(productDetails);
+  // here the type is a discriminator property
+  if (productDetails.type === 'clothing') {
+    return new Clothing(productDetails);
+  } else {
+    return new Product(productDetails);
+  }
+
 });
 
 // console.log(products);
