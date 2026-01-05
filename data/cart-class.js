@@ -1,3 +1,4 @@
+
 class Cart {
     // features that help us generate objects(represent the real world), 
     // class has extra features for oop
@@ -6,17 +7,21 @@ class Cart {
     // same:
     // cartItems = undefined;
     // localStorageKey = undefined;
+
+    // use private to avoid sth inside this class to be visited and modified from outside.
     cartItems;
-    localStorageKey;
+    #localStorageKey;
 
     // name has to be constructor, and void, no return
     constructor(localStorageKey) {   
-        this.localStorageKey = localStorageKey;
-        this.loadCart();
+        this.#localStorageKey = localStorageKey;
+        this.#loadCart();
     }
 
-    loadCart() {
-        this.cartItems = this.loadFromStorage(this.localStorageKey);
+
+    // we could also add # to make it privated.
+    #loadCart() {
+        this.cartItems = this.loadFromStorage(this.#localStorageKey);
         this.cartItems = this.cartItems ?? [
             {
                 productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
@@ -35,7 +40,7 @@ class Cart {
 
     // local storage
     saveToStorage() {
-        localStorage.setItem(this.localStorageKey, JSON.stringify(this.cartItems));
+        localStorage.setItem(this.#localStorageKey, JSON.stringify(this.cartItems));
     }
 
     loadFromStorage(str) {
@@ -142,6 +147,7 @@ class Cart {
 }
 
 
+/*
 const cart2 = new Cart();
 const businessCart2 = new Cart();
 cart2.localStorageKey = 'cart-oops-class'
@@ -153,17 +159,16 @@ cart2.addToCart("54e0eccd-8f36-462b-b68a-8182611d9add");
 cart2.addToCart("0123");
 console.log(cart2);
 
-// use constuctor:
-const cart3 = new Cart('cart-constructor');
-console.log(cart3);
-
 // create multiple different cart via copy and paste, or a function; 
 // in PascalCase means it generate objects
 businessCart2.loadCart();
 businessCart2.addToCart("0123");
 console.log(businessCart2);
 console.log(businessCart2 instanceof Cart);
+*/
 
-
+// use constuctor:
+const cart3 = new Cart('cart-constructor');
+console.log(cart3);
 
 
