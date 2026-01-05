@@ -3,8 +3,8 @@ import { renderPaymentSummary } from './checkout/paymentSummary.js';
 import { renderCheckoutHeader } from './checkout/checkoutHeader.js';
 import { loadCart } from '../data/cart.js';
 // checking oop version of the code:
-import '../data/cart-oop.js';
-import '../data/cart-class.js';
+// import '../data/cart-oop.js';
+// import '../data/cart-class.js';
 
 // ✅ 1. 初始化数据
 loadCart();
