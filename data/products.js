@@ -34,7 +34,7 @@ class Product {
     return `$${formatCurrency(this.priceCents)}`;
   }
 
-  extraInfoHTML(){
+  extraInfoHTML() {
     return ``;
   }
 }
@@ -51,7 +51,7 @@ class Clothing extends Product {
 
   // override the parent's method
   // On amazon page we use the method without knowing the class, Pilymorphism
-  extraInfoHTML(){
+  extraInfoHTML() {
     return `
       <a href="${this.sizeChartLink}" target="_blank">
         Size chart
@@ -788,3 +788,38 @@ export const products = [
 });
 
 // console.log(products);
+
+/*
+//built in class:
+const date = new Date();
+console.log(date);
+console.log(date.toLocaleDateString());
+
+// 'this' is normally for outer object for point to inside function, 
+// original JS, this = on our current window, nothing to point -> give us undfined
+// modules -> inside module, but outside of a function, undefined
+console.log(this);
+
+// use this inside a function:
+function logThis() {
+  console.log(this);
+}
+
+logThis();
+// but with call, we can modify this
+logThis.call('hello, 42');
+
+// arrow function can't change this!!!! to avoid accidentally overriding this,( forEach)
+const object1 = {
+  method: () => {
+    console.log(this);
+  }
+}
+object1.method();
+
+// summary of this:
+// inside method(a variable/const...), this -> outer object
+// inside a function, this = undefined, use .call to change it as we wish
+// using arrow function, do not change the value of 'this'
+
+*/
