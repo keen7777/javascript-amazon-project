@@ -11,7 +11,7 @@ export function getProduct(productId) {
 }
 
 // create a class to generate Product(as Object)
-class Product {
+export class Product {
   id;
   image;
   name;
@@ -41,7 +41,7 @@ class Product {
 
 // L17, inheritance for parent class and children class
 
-class Clothing extends Product {
+export class Clothing extends Product {
   sizeChartLink;
   constructor(productDetails) {
     // super is the constructor of parent class.(will run by default if leave it blank)
@@ -80,8 +80,6 @@ const tshirt = new Clothing({
 console.log(tshirt);
 console.log(tshirt.getPrice());
 */
-
-
 /*
 // this is an illustration
 const product1 = new Product({
@@ -101,6 +99,29 @@ const product1 = new Product({
 });
 console.log(product1);
 */
+
+export class Appliance extends Product {
+  instructionsLink;
+  warrantyLink;
+  constructor(productDetails) {
+    // super is the constructor of parent class.(will run by default if leave it blank)
+    super(productDetails);
+    this.warrantyLink = productDetails.warrantyLink;
+    this.instructionsLink = productDetails.instructionsLink;
+  }
+
+  // override the parent's method
+  // On amazon page we use the method without knowing the class, Pilymorphism
+  extraInfoHTML() {
+    return `
+      <a href="${this.instructionsLink}" target="_blank">
+        Instructions
+      </a>
+      <a href="${this.warrantyLink}" target="_blank">
+        Warranty
+      </a>`;
+  }
+}
 
 export const products = [
   {
@@ -162,7 +183,10 @@ export const products = [
       "toaster",
       "kitchen",
       "appliances"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink: "images/appliance-warranty.png"
   },
   {
     id: "3ebe75dc-64d2-4137-8860-1f5a963e534b",
@@ -347,7 +371,10 @@ export const products = [
       "water boiler",
       "appliances",
       "kitchen"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink: "images/appliance-warranty.png"
   },
   {
     id: "6b07d4e7-f540-454e-8a1e-363f25dbae7d",
@@ -652,7 +679,10 @@ export const products = [
       "coffeemakers",
       "kitchen",
       "appliances"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink: "images/appliance-warranty.png"
   },
   {
     id: "02e3a47e-dd68-467e-9f71-8bf6f723fdae",
@@ -712,7 +742,10 @@ export const products = [
       "food blenders",
       "kitchen",
       "appliances"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink: "images/appliance-warranty.png"
   },
   {
     id: "36c64692-677f-4f58-b5ec-0dc2cf109e27",
@@ -781,7 +814,10 @@ export const products = [
   // here the type is a discriminator property
   if (productDetails.type === 'clothing') {
     return new Clothing(productDetails);
-  } else {
+  } else if(productDetails.type === 'appliance'){
+    return new Appliance(productDetails);
+  }
+  else {
     return new Product(productDetails);
   }
 
