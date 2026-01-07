@@ -101,20 +101,20 @@ console.log(product1);
 */
 
 export class Appliance extends Product {
-  instructionsLink;
+  instructionLink;
   warrantyLink;
   constructor(productDetails) {
     // super is the constructor of parent class.(will run by default if leave it blank)
     super(productDetails);
     this.warrantyLink = productDetails.warrantyLink;
-    this.instructionsLink = productDetails.instructionsLink;
+    this.instructionLink = productDetails.instructionLink;
   }
 
   // override the parent's method
   // On amazon page we use the method without knowing the class, Pilymorphism
   extraInfoHTML() {
     return `
-      <a href="${this.instructionsLink}" target="_blank">
+      <a href="${this.instructionLink}" target="_blank">
         Instructions
       </a>
       <a href="${this.warrantyLink}" target="_blank">

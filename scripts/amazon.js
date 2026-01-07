@@ -10,12 +10,14 @@
 // import {cart as myCart} from '../data/cart.js';
 // import * as cartModule from '../data/cart.js';
 
-import { cart, addToCart, calculateCartQuantity,loadCart } from '../data/cart.js';
+
+import {cart} from '../data/cart-class.js';
+// import { cart, addToCart, calculateCartQuantity,loadCart } from '../data/cart.js';
 import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
-loadCart();
+// loadCart();
 let productsHTML = '';
 // loop through the product array and create single product's html
 products.forEach((product) => {
@@ -76,7 +78,7 @@ products.forEach((product) => {
 // console.log(productsHTML);
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
 // update UI and calculate current item amount:
-const quantity = calculateCartQuantity(cart);
+const quantity = cart.calculateCartQuantity(cart);
 updateCartQuantityDisplay(quantity);
 
 
@@ -92,7 +94,7 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
   button.addEventListener('click', () => {
     const { productId } = button.dataset;
 
-    addToCart(productId);
+    cart.addToCart(productId);
 
     const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
     addToCartSelector.classList.add('added-to-cart-seen');
@@ -109,7 +111,7 @@ document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
     }, 2000);
 
     // update total cart quantity
-    const quantity = calculateCartQuantity(cart);
+    const quantity = cart.calculateCartQuantity(cart.cartItems);
     updateCartQuantityDisplay(quantity);
   });
 });

@@ -168,7 +168,7 @@ console.log(businessCart2 instanceof Cart);
 */
 
 // use constuctor:
-const cart3 = new Cart('cart-constructor');
-console.log(cart3);
+export const cart = new Cart('cart-oop');
+console.log(cart);
 
 

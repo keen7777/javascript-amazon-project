@@ -1,30 +1,30 @@
-import { cart} from '../../data/cart.js';
+import { cart } from '../../data/cart-class.js';
 import { getProduct } from '../../data/products.js';
 import { getDeliveryOption } from '../../data/deliveryOptions.js'
 import { formatCurrency } from '../utils/money.js';
 
 export function renderPaymentSummary() {
-    // products cost 
-    //delivery cost
-    let productPriceCents = 0;
-    let shippingPriceCents = 0;
-    let totalCartQuantity = 0;
-    cart.forEach((cartItem) => {
-        const product = getProduct(cartItem.productId);
-        productPriceCents += product.priceCents * cartItem.quantity;
-        const deliveryOption = getDeliveryOption(cartItem.deliveryOptionId);
-        shippingPriceCents += deliveryOption.priceCents;
-        totalCartQuantity = totalCartQuantity + cartItem.quantity;
-    });
+  // products cost 
+  //delivery cost
+  let productPriceCents = 0;
+  let shippingPriceCents = 0;
+  let totalCartQuantity = 0;
+  cart.cartItems.forEach((cartItem) => {
+    const product = getProduct(cartItem.productId);
+    productPriceCents += product.priceCents * cartItem.quantity;
+    const deliveryOption = getDeliveryOption(cartItem.deliveryOptionId);
+    shippingPriceCents += deliveryOption.priceCents;
+    totalCartQuantity = totalCartQuantity + cartItem.quantity;
+  });
 
-    // console.log(productPriceCents);
-    // console.log(shippingPriceCents);
-    const totalBeforeTaxCents = productPriceCents + shippingPriceCents;
-    const taxCents = totalBeforeTaxCents * 0.1;
-    const totalCents = totalBeforeTaxCents + taxCents;
+  // console.log(productPriceCents);
+  // console.log(shippingPriceCents);
+  const totalBeforeTaxCents = productPriceCents + shippingPriceCents;
+  const taxCents = totalBeforeTaxCents * 0.1;
+  const totalCents = totalBeforeTaxCents + taxCents;
 
-    //generate HTML:
-    const paymentSummaryHTML = `
+  //generate HTML:
+  const paymentSummaryHTML = `
           <div class="payment-summary-title">
             Order Summary
           </div>
@@ -59,5 +59,5 @@ export function renderPaymentSummary() {
           </button>
     `;
 
-document.querySelector('.js-payment-summary').innerHTML = paymentSummaryHTML;
+  document.querySelector('.js-payment-summary').innerHTML = paymentSummaryHTML;
 }

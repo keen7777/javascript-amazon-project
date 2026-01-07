@@ -1,4 +1,4 @@
-import { cart } from "../data/cart.js";
+import { cart } from "../data/cart-class.js";
 
 // ui/modifyCart.js
 export function updateCartQuantityDisplay(quantity) {

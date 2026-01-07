@@ -1,4 +1,5 @@
-import { cart, removeFromCart, updateDeliveryOption, loadCart } from '../../data/cart.js';
+// import { cart, removeFromCart, updateDeliveryOption, loadCart } from '../../data/cart.js';
+import { cart } from '../../data/cart-class.js';
 import { products, getProduct } from '../../data/products.js';
 import { formatCurrency } from '../utils/money.js'
 // dayjs is the default export, only one default for each file
@@ -7,16 +8,14 @@ import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 // we'd prefer esm version to avoid naming conflicts
 // use DayJS external library to handle delivery options.(always been minification for smaller data size)
 import { deliveryOptions, getDeliveryOption, calculateDeliveryDate } from '../../data/deliveryOptions.js';
-import { renderPaymentSummary } from './paymentSummary.js';
-import { renderCheckoutHeader } from './checkoutHeader.js';
+
 
 // from 14 import
-import { handleUpdateQuantity } from '../../data/cart.js'
 import { showInputSaveButton, removeInputSaveButton } from "../../ui/modifyCart.js";
 
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
-  cart.forEach(cartItem => {
+  cart.cartItems.forEach(cartItem => {
     const productId = cartItem.productId;
     const matchingProduct = getProduct(productId);
 
@@ -136,8 +135,8 @@ export function renderOrderSummary() {
   }
 
   document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
-  // put quantity update here:
-  renderCheckoutHeader();
+  // put quantity update here: 
+  // renderCheckoutHeader();
 }
 
 
@@ -147,7 +146,7 @@ export function renderOrderSummary() {
 // click logic
 
 // !!!!!!!!!wraping into a function so that the loading order is ok for the test.
-export function initOrderSummary() {
+export function initOrderSummary(rerender) {
   const container = document.querySelector('.js-order-summary');
   if (!container) return;
 
@@ -156,7 +155,7 @@ export function initOrderSummary() {
     // delete link logic
     if (deleteLink) {
       const productId = deleteLink.dataset.productId;
-      removeFromCart(productId);
+      cart.removeFromCart(productId);
       rerender();
       return; // 
     }
@@ -179,7 +178,6 @@ export function initOrderSummary() {
       // rendering as a whole page, not local item.
       removeInputSaveButton(productId); // 取消编辑状态
       rerender();
-      rerender();
       return;
     }
 
@@ -188,21 +186,23 @@ export function initOrderSummary() {
     const deliveryOption = e.target.closest('.js-delivery-option');
     if (deliveryOption) {
       const { productId, deliveryOptionId } = deliveryOption.dataset;
-      updateDeliveryOption(productId, deliveryOptionId);
+      cart.updateDeliveryOption(productId, deliveryOptionId);
       rerender();
       return;
     }
   });
 
-  //key wraping function:
-  document.addEventListener('keydown', handleQuantityKeydown);
+  //key wraping function: use rerender
+  document.addEventListener('keydown', (e) => {
+    handleQuantityKeydown(e, rerender);
+  });
 
 }
 
 
 //keylogic:
 // !!!!!!!!!wraping into a function so that the loading order is ok for the test.
-function handleQuantityKeydown(e) {
+function handleQuantityKeydown(e, rerender) {
   const container = getEditingProductContainer();
   if (!container) return;
 
@@ -246,10 +246,4 @@ function getEditingProductContainer() {
 // Update → 初始化 input
 // Escape → 纯 UI 状态切换
 
-// helper function for re-render everything on checkout page:
-function rerender() {
-  renderOrderSummary();
-  renderPaymentSummary();
-  renderCheckoutHeader();
-}
 
