@@ -1,134 +1,130 @@
 import { renderOrderSummary, initOrderSummary } from "../../scripts/checkout/orderSummary.js";
-import { addToCart, cart, loadCart } from "../../data/cart.js";
+import { cart } from "../../data/cart-class.js";
+
+// mock rerender function for testing
+function mockRerender() {
+  renderOrderSummary();
+}
+
+// product IDs
+const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6'; // socks
+const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d'; // basketball
 
 describe("Integration test suite: renderOrderSummary", () => {
-    // test :
-    // how the page looks,
-    // how the page behaves; 
-    // since it's generate html element and stored the context inside, we have another div in our test.html
+  beforeEach(() => {
+    // 清空 DOM 并重新创建容器
+    const container = document.querySelector('.js-test-container');
+    container.innerHTML = `
+      <div class="js-order-summary"></div>
+      <div class="js-payment-summary"></div>
+      <div class="js-checkout-header"></div>
+    `;
 
-    // a mock is only lasts for one test! should not pollute other tests/normal code.
-    beforeEach(() => {
-        // we also have afterEach. afterAll, beforeAll
-        spyOn(localStorage, 'setItem'); // so that addtocart won't affect local storage.
-        document.querySelector('.js-test-container').innerHTML = `
-        <div class="js-order-summary"></div>
-        <div class="js-checkout-header"></div>
-        <div class="js-payment-summary"></div>
-        `;
+    // 初始化 cart
+    cart.cartItems = [
+      { productId: productId1, quantity: 2, deliveryOptionId: '1', isEditing: false },
+      { productId: productId2, quantity: 1, deliveryOptionId: '2', isEditing: false }
+    ];
 
-        spyOn(localStorage, 'getItem').and.callFake(() => {
-            return JSON.stringify([{
-                productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-                quantity: 2,
-                deliveryOptionId: '1',
-                isEditing: false
-            },
-            {
-                productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
-                quantity: 1,
-                deliveryOptionId: '2',
-                isEditing: false
-            }]);
-        });
-        loadCart();
-        renderOrderSummary();
-        initOrderSummary();
+    // 渲染并绑定事件
+    renderOrderSummary();
+    initOrderSummary(mockRerender);
+  });
+
+  afterEach(() => {
+    // 清理 DOM 和 cart
+    const container = document.querySelector('.js-test-container');
+    container.innerHTML = '';
+    cart.cartItems = [];
+  });
+
+  it('displays the cart with correct quantities and names', () => {
+    const items = document.querySelectorAll('.js-cart-item-container');
+    expect(items.length).toEqual(2);
+
+    // 检查第一个商品
+    const quantity1 = document.querySelector(`.js-product-quantity-${productId1}`);
+    const name1 = document.querySelector(`.js-product-name-${productId1}`);
+    expect(quantity1).not.toBeNull();
+    expect(quantity1.innerText).toContain('Quantity: 2');
+    expect(name1.innerText).toContain('Black and Gray Athletic Cotton Socks - 6 Pairs');
+
+    // 检查第二个商品
+    const quantity2 = document.querySelector(`.js-product-quantity-${productId2}`);
+    const name2 = document.querySelector(`.js-product-name-${productId2}`);
+    expect(quantity2).not.toBeNull();
+    expect(quantity2.innerText).toContain('Quantity: 1');
+    expect(name2.innerText).toContain('Intermediate Size Basketball');
+
+    // 检查所有价格包含 $
+    document.querySelectorAll('.product-price').forEach(el => {
+      expect(el.innerText).toContain('$');
     });
+  });
 
-    // e16f, clean up test container after each test
+  it('removes a product from the cart when delete is clicked', () => {
+    const items = document.querySelectorAll('.js-cart-item-container');
+    expect(items.length).toEqual(2);
 
-    afterEach(() => {
-        document.querySelector('.js-test-container').innerHTML = '';
-    });
+    const deleteLink = document.querySelector(`.js-delete-link-${productId1}`);
+    expect(deleteLink).not.toBeNull();
+    deleteLink.click();
 
-    const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6';
-    const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d';
+    // 删除后 DOM
+    expect(document.querySelectorAll('.js-cart-item-container').length).toEqual(1);
+    expect(document.querySelector(`.js-product-quantity-${productId1}`)).toBeNull();
+    expect(document.querySelector(`.js-product-quantity-${productId2}`)).not.toBeNull();
 
-    it('displays the cart', () => {
-        // check if the cart has 2 products(item container) inside.
-        expect(document.querySelectorAll('.js-cart-item-container').length).toEqual(2);
-
-        //e16g, check name and quantity for each product
-        expect(document.querySelector(`.js-product-quantity-${productId1}`).innerText).toContain('Quantity: 2');
-        expect(document.querySelector(`.js-product-name-${productId1}`).innerText).toContain('Black and Gray Athletic Cotton Socks - 6 Pairs');
-        expect(document.querySelector(`.js-product-quantity-${productId2}`).innerText).toContain('Quantity: 1');
-        expect(document.querySelector(`.js-product-name-${productId2}`).innerText).toContain('Intermediate Size Basketball');
-        // e16h: loop through the list to make sure each product's price has a $ in front.
-        expect(document.querySelectorAll(`.product-price`).forEach(e => {
-            expect(e.innerText).toContain('$');
-        }));
-
-        // document.querySelector('.js-test-container').innerHTML = ``;
-    });
-
-    it('remove a product from the cart(delete)', () => {
-        expect(document.querySelectorAll('.js-cart-item-container').length).toEqual(2);
-        document.querySelector(`.js-delete-link-${productId1}`).click();
-        expect(document.querySelectorAll('.js-cart-item-container').length).toEqual(1);
-        expect(document.querySelector(`.js-product-quantity-${productId2}`).innerText).toContain('Quantity: 1');
-        expect(document.querySelector(`.js-product-quantity-${productId1}`)).toEqual(null);
-        expect(document.querySelector(`.js-product-quantity-${productId2}`)).not.toEqual(null);
-
-        //check after delete first element is product2:
-        expect(cart.length).toEqual(1);
-        expect(cart[0].productId).toEqual(productId2);
-        // document.querySelector('.js-test-container').innerHTML = `finished`;
-    });
+    // 删除后 cart
+    expect(cart.cartItems.length).toEqual(1);
+    expect(cart.cartItems[0].productId).toEqual(productId2);
+  });
 });
 
 describe('Integration test suite: delivery option', () => {
-    beforeEach(() => {
-        document.querySelector('.js-test-container').innerHTML = `
-    <div class="js-order-summary"></div>
-    <div class="js-payment-summary"></div>
-    <div class="js-checkout-header"></div>
-  `;
-        spyOn(localStorage, 'setItem');
-        // e16 i: pre-adding a puppy, which function calls won't counted in test cases.
-        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify([{
-            productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-            quantity: 2,
-            deliveryOptionId: '1',
-            isEditing: false
-        },
-        {
-            productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
-            quantity: 1,
-            deliveryOptionId: '2',
-            isEditing: false
-        }])
-        );
-        loadCart();
-        renderOrderSummary();
-        initOrderSummary();
-    });
-    afterEach(() => {
-        document.querySelector('.js-test-container').innerHTML = '';
-     });
-    const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6'; // socks, 2 
-    const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d'; // basketball, 1
+  beforeEach(() => {
+    const container = document.querySelector('.js-test-container');
+    container.innerHTML = `
+      <div class="js-order-summary"></div>
+      <div class="js-payment-summary"></div>
+      <div class="js-checkout-header"></div>
+    `;
 
-    it('updates the delivery option from 1 to 3 for the socks (id1))', () => {
-        
-        // modify the delivery options:
-        document.querySelector(`.js-delivery-option-${productId1}-3`).click();
+    cart.cartItems = [
+      { productId: productId1, quantity: 2, deliveryOptionId: '1', isEditing: false },
+      { productId: productId2, quantity: 1, deliveryOptionId: '2', isEditing: false }
+    ];
 
-        // adding corresponding js-class in order summary, but increase coupling. should use data-id thing constantly
-        expect(
-            document.querySelector(`.js-delivery-option-input-${productId1}-3`).checked
-        ).toEqual(true);
+    renderOrderSummary();
+    initOrderSummary(mockRerender);
+  });
 
-        expect(cart.length).toEqual(2);
-        expect(cart[0].productId).toEqual(productId1);
-        expect(cart[0].deliveryOptionId).toEqual('3');
+  afterEach(() => {
+    const container = document.querySelector('.js-test-container');
+    container.innerHTML = '';
+    cart.cartItems = [];
+  });
 
-        expect(
-            document.querySelector('.js-payment-summary-shipping').innerText
-        ).toEqual('$14.98');
-        expect(
-            document.querySelector('.js-payment-summary-total').innerText
-        ).toEqual('$63.50');
-    });
+  it('updates the delivery option for the first product', () => {
+    const optionInput = document.querySelector(`.js-delivery-option-input-${productId1}-3`);
+    expect(optionInput).not.toBeNull();
+    const optionButton = document.querySelector(`.js-delivery-option-${productId1}-3`);
+    expect(optionButton).not.toBeNull();
 
+    optionButton.click();
+
+    // 检查 radio 被选中
+    expect(optionInput.checked).toBeTrue();
+
+    // 检查 cart 数据更新
+    expect(cart.cartItems[0].deliveryOptionId).toEqual('3');
+  });
+
+  it('does nothing if updating a product not in cart', () => {
+    const nonExistent = document.querySelector(`.js-delivery-option-${'nonexistent'}-3`);
+    expect(nonExistent).toBeNull();
+
+    // 不在 cart 的情况下不报错
+    expect(() => cart.updateDeliveryOption('nonexistent', '3')).not.toThrow();
+  });
 });

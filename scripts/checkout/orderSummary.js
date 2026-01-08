@@ -233,7 +233,7 @@ function saveQuantity(productId) {
   // 调用更新数量的逻辑
   const container = document.querySelector(`[data-product-id="${productId}"]`);
   const inputValueString = container.querySelector('.quantity-input').value;
-  handleUpdateQuantity(inputValueString, productId);
+  cart.handleUpdateQuantity(inputValueString, productId);
   return;
 }
 

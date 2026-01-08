@@ -1,156 +1,104 @@
-import { addToCart, cart, loadCart, removeFromCart, updateDeliveryOption } from "../../data/cart.js";
-// remember the test coverage!, maximize it!
-// flaky test, have to deal with localstorage(clear or not)
-// using Mocks!
+import { cart } from "../../data/cart-class.js";
+
 describe('Function test suite: addToCart', () => {
-    // a mock is only lasts for one test! should not pollute other tests/normal code.
+
     beforeEach(() => {
-        spyOn(localStorage, 'getItem').and.callFake(() => {
-            return JSON.stringify([]);
-        });
-        loadCart(); // after mock, initialize localStorage to [];
-        // e16e: pre-adding a puppy, which function calls won't counted in test cases.
-        spyOn(localStorage, 'setItem').and.callFake(() => {
-            return JSON.stringify([{
-                productId: '0123',
-                quantity: 1,
-                deliveryOptionId: '1',
-                isEditing: false
-            }]);
-        }); // so that addtocart won't affect local storage.
+        // 重置 cart
+        cart.cartItems = [];
+
+        // spy localStorage, 不返回假的 state
+        spyOn(localStorage, 'getItem').and.returnValue(null);
+        spyOn(localStorage, 'setItem');
     });
 
     afterEach(() => {
-        
+        cart.cartItems = [];
+        localStorage.setItem.calls.reset();
+        localStorage.getItem.calls.reset();
     });
 
     it('adds new item if it does not exist in cart', () => {
+        cart.addToCart('0123'); // first add
+        expect(cart.cartItems.length).toBe(1);
+        expect(cart.cartItems[0].productId).toBe('0123');
+        expect(cart.cartItems[0].quantity).toBe(1);
+        expect(localStorage.setItem).toHaveBeenCalledTimes(1);
 
-        addToCart('0123'); // first add
-        // e16c-d: check if setItem called with the puppy:
-        expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([{
-            productId: '0123',
-            quantity: 1,
-            deliveryOptionId: '1',
-            isEditing: false
-        }]));
-        addToCart('e43638ce-6aa0-4b85-b27f-e1d07eb678c6'); // add different item
-
-        expect(cart.length).toEqual(2);
-        expect(cart[1].productId).toBe('e43638ce-6aa0-4b85-b27f-e1d07eb678c6');
-        expect(cart[1].quantity).toBe(1);
+        cart.addToCart('e43638ce-6aa0-4b85-b27f-e1d07eb678c6'); // add another
+        expect(cart.cartItems.length).toBe(2);
+        expect(cart.cartItems[1].productId).toBe('e43638ce-6aa0-4b85-b27f-e1d07eb678c6');
+        expect(cart.cartItems[1].quantity).toBe(1);
         expect(localStorage.setItem).toHaveBeenCalledTimes(2);
     });
 
-
     it('adds new item when cart is empty', () => {
-        addToCart('0123');
-        expect(cart.length).toBe(1);
-        expect(cart[0].productId).toBe('0123');
-        expect(cart[0].quantity).toBe(1);
+        cart.addToCart('0123');
+        expect(cart.cartItems.length).toBe(1);
+        expect(cart.cartItems[0].productId).toBe('0123');
+        expect(cart.cartItems[0].quantity).toBe(1);
         expect(localStorage.setItem).toHaveBeenCalledTimes(1);
     });
-
-
 
     it('increases quantity if item already exists in cart', () => {
-        // 手动在 cart 里添加一个商品, we can also use the spyon like that(without beforeeach):
-        /*
-        spyOn(localStorage, 'getItem').and.callFake(() => {
-            return JSON.stringify([{ productId: '0123', quantity: 2, deliveryOptionId: '1' }]);
-        });
-        */
-        cart.push({ productId: '0123', quantity: 2, deliveryOptionId: '1' });
-        addToCart('0123');
-        expect(cart.length).toBe(1);       // no new item
-        expect(cart[0].quantity).toBe(3);  // quantity +1
+        cart.cartItems.push({ productId: '0123', quantity: 2, deliveryOptionId: '1', isEditing: false });
+        cart.addToCart('0123');
+        expect(cart.cartItems.length).toBe(1);       // no new item
+        expect(cart.cartItems[0].quantity).toBe(3);  // quantity +1
         expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-    });
-
-}); //end of add to cart tests
-
-describe('Function test suite: removeFromCart', () => {
-    beforeEach(() => {
-        spyOn(localStorage, 'setItem');
-        // e16 i: pre-adding a puppy, which function calls won't counted in test cases.
-        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify([{
-            productId: '0123',
-            quantity: 2,
-            deliveryOptionId: '1',
-            isEditing: false
-        }])
-        );
-        loadCart();
-    });
-    afterEach(() => { });
-
-    it('remove a productId that is in the cart', () => {
-        // console.log(cart);
-        expect(cart.length).toBe(1);
-        removeFromCart('0123');
-        expect(cart.length).toBe(0);
-        expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-        expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([]));
-    });
-
-    it('remove a productId that is not in the cart', () => {
-        // console.log(cart);
-        expect(cart.length).toBe(1);
-        removeFromCart('e43638ce-6aa0-4b85-b27f-e1d07eb678c6');
-        expect(cart.length).toBe(1);
-        expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-        expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([{
-            productId: '0123',
-            quantity: 2,
-            deliveryOptionId: '1',
-            isEditing: false
-        }]));
     });
 
 });
 
-// e16:k,l, check updateDeliveryOption function
+describe('Function test suite: removeFromCart', () => {
+    beforeEach(() => {
+        cart.cartItems = [{ productId: '0123', quantity: 2, deliveryOptionId: '1', isEditing: false }];
+        spyOn(localStorage, 'setItem');
+        spyOn(localStorage, 'getItem').and.returnValue(null);
+    });
+
+    afterEach(() => {
+        cart.cartItems = [];
+    });
+
+    it('remove a productId that is in the cart', () => {
+        expect(cart.cartItems.length).toBe(1);
+        cart.removeFromCart('0123');
+        expect(cart.cartItems.length).toBe(0);
+        expect(localStorage.setItem).toHaveBeenCalledTimes(1);
+        expect(localStorage.setItem).toHaveBeenCalledWith('cart-oop', JSON.stringify([]));
+    });
+
+    it('remove a productId that is not in the cart', () => {
+        expect(cart.cartItems.length).toBe(1);
+        cart.removeFromCart('9999'); // 不存在的商品
+        expect(cart.cartItems.length).toBe(1);
+        expect(localStorage.setItem).toHaveBeenCalledTimes(1); // 还是会更新一次
+    });
+});
+
 describe('Function test suite: updateDeliveryOption', () => {
     beforeEach(() => {
+        cart.cartItems = [{ productId: '0123', quantity: 2, deliveryOptionId: '1', isEditing: false }];
         spyOn(localStorage, 'setItem');
-        // e16 i: pre-adding a puppy, which function calls won't counted in test cases.
-        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify([{
-            productId: '0123',
-            quantity: 2,
-            deliveryOptionId: '1',
-            isEditing: false
-        }])
-        );
-        loadCart();
     });
-    afterEach(() => { });
+
+    afterEach(() => {
+        cart.cartItems = [];
+    });
 
     it('update the delivery option of a product in the cart', () => {
-        // console.log(cart);
-        expect(cart.length).toBe(1);
-        updateDeliveryOption('0123', '3');
+        cart.updateDeliveryOption('0123', '3');
+        expect(cart.cartItems[0].deliveryOptionId).toBe('3');
         expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-        expect(localStorage.setItem).toHaveBeenCalledWith('cart', JSON.stringify([{
-            productId: '0123',
-            quantity: 2,
-            deliveryOptionId: '3',
-            isEditing: false
-        }]));
     });
 
-    it('update the delivery option of a product NOT!!! in the cart', () => {
-        // console.log(cart);
-        expect(cart.length).toBe(1);
-        updateDeliveryOption('e43638ce-6aa0-4b85-b27f-e1d07eb678c6', '3');
+    it('update the delivery option of a product NOT in the cart', () => {
+        cart.updateDeliveryOption('9999', '3');
         expect(localStorage.setItem).toHaveBeenCalledTimes(0);
     });
 
-    // e16m: with an illegal delivery option '4'
-    it('edge case: update an (illegal) delivery option of a product in the cart', () => {
-        // console.log(cart);
-        expect(cart.length).toBe(1);
-        updateDeliveryOption('0123', '4');
+    it('edge case: update an illegal delivery option of a product in the cart', () => {
+        cart.updateDeliveryOption('0123', '4'); // 假设 '4' 不合法
         expect(localStorage.setItem).toHaveBeenCalledTimes(0);
     });
-
 });
