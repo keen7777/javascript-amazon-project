@@ -1,4 +1,4 @@
-import { products, getProduct, Product, Appliance, Clothing } from "../../data/products.js";
+import {Product, Appliance, Clothing } from "../../data/products.js";
 
 describe('Class test suite: Product', () => {
   let product;
@@ -117,7 +117,7 @@ describe('Class test suite: Appliance', () => {
         "appliances"
       ],
       type: 'appliance',
-      instructionsLink: 'images/appliance-instructions.png',
+      instructionLink: 'images/appliance-instructions.png',
       warrantyLink: 'images/appliance-warranty.png'
     });
   });
@@ -126,7 +126,7 @@ describe('Class test suite: Appliance', () => {
     expect(appliance.id).toEqual('54e0eccd-8f36-462b-b68a-8182611d9add'),
     expect(appliance.image).toEqual('images/products/black-2-slot-toaster.jpg');
 
-    expect(appliance.instructionsLink).toEqual('images/appliance-instructions.png');
+    expect(appliance.instructionLink).toEqual('images/appliance-instructions.png');
     expect(appliance.warrantyLink).toEqual('images/appliance-warranty.png');
   });
 

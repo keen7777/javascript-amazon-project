@@ -13,7 +13,7 @@ class Cart {
     #localStorageKey;
 
     // name has to be constructor, and void, no return
-    constructor(localStorageKey) {   
+    constructor(localStorageKey) {
         this.#localStorageKey = localStorageKey;
         this.#loadCart();
     }
@@ -144,6 +144,13 @@ class Cart {
             this.saveToStorage();
         }
     }
+
+    setEditing(productId, isEditing) {
+        const item = this.cartItems.find(i => i.productId === productId);
+        if (!item) return;
+        item.isEditing = isEditing;
+    }
+
 }
 
 

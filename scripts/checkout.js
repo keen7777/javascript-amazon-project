@@ -15,11 +15,8 @@ function rerenderCheckoutPage() {
 }
 
 
-// ✅ 1. 初始化数据
-// loadCart();
-
-// ✅ 2. 首次渲染
+// ✅ 1. 首次渲染
 rerenderCheckoutPage();
 
-// ✅ 3. 绑定所有行为
+// ✅ 2. 绑定所有行为
 initOrderSummary(rerenderCheckoutPage);

@@ -11,7 +11,7 @@ import { deliveryOptions, getDeliveryOption, calculateDeliveryDate } from '../..
 
 
 // from 14 import
-import { showInputSaveButton, removeInputSaveButton } from "../../ui/modifyCart.js";
+
 
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
@@ -164,8 +164,8 @@ export function initOrderSummary(rerender) {
     const updateLink = e.target.closest('.js-update-link');
     if (updateLink) {
       const productId = updateLink.dataset.productId;
-      showInputSaveButton(productId);
-      rerender();
+      cart.setEditing(productId, true);   // ⭐ 写入状态
+      rerender();                         // ⭐ 统一重渲染
       return;
     }
 
@@ -176,7 +176,7 @@ export function initOrderSummary(rerender) {
       const productId = saveLink.dataset.productId;
       saveQuantity(productId);
       // rendering as a whole page, not local item.
-      removeInputSaveButton(productId); // 取消编辑状态
+      cart.setEditing(productId, false);
       rerender();
       return;
     }
@@ -216,7 +216,7 @@ function handleQuantityKeydown(e, rerender) {
 
   switch (e.key) {
     case 'Escape':
-      removeInputSaveButton(productId);
+      cart.setEditing(productId, false);
       rerender();
       break;
 
@@ -233,7 +233,7 @@ function saveQuantity(productId) {
   // 调用更新数量的逻辑
   const container = document.querySelector(`[data-product-id="${productId}"]`);
   const inputValueString = container.querySelector('.quantity-input').value;
-  handleUpdateQuantity(inputValueString, productId);
+  cart.handleUpdateQuantity(inputValueString, productId);
   return;
 }
 

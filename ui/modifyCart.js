@@ -12,16 +12,3 @@ export function updateCartQuantityDisplay(quantity) {
 }
 
 
-// 
-export function showInputSaveButton(productId) {
-  const item = cart.find(i => i.productId === productId);
-  if (!item) return;
-  item.isEditing = true;
-}
-
-// 
-export function removeInputSaveButton(productId) {
-  const item = cart.find(i => i.productId === productId);
-  if (!item) return;
-  item.isEditing = false;
-}
