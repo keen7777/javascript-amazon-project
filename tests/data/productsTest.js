@@ -21,6 +21,8 @@ describe('Class test suite: Product', () => {
     });
   });
 
+
+
   it('has the correct properties', () => {
     // Note: you don't have to test all the properties.
     // You can just pick a few to test.
@@ -70,9 +72,10 @@ describe('Class test suite: Clothing', () => {
     });
   });
 
+
   it('has the correct properties', () => {
     // Check if inheritance worked correctly.
-    expect(clothing.id).toEqual('83d4ca15-0f35-48f5-b7a3-1ea210004f2e'),
+    expect(clothing.id).toEqual('83d4ca15-0f35-48f5-b7a3-1ea210004f2e');
     expect(clothing.image).toEqual('images/products/adults-plain-cotton-tshirt-2-pack-teal.jpg');
 
     expect(clothing.sizeChartLink).toEqual('images/clothing-size-chart.png');
@@ -122,8 +125,10 @@ describe('Class test suite: Appliance', () => {
     });
   });
 
+
+
   it('has the correct properties', () => {
-    expect(appliance.id).toEqual('54e0eccd-8f36-462b-b68a-8182611d9add'),
+    expect(appliance.id).toEqual('54e0eccd-8f36-462b-b68a-8182611d9add');
     expect(appliance.image).toEqual('images/products/black-2-slot-toaster.jpg');
 
     expect(appliance.instructionLink).toEqual('images/appliance-instructions.png');

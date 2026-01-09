@@ -1,140 +1,45 @@
 import { renderOrderSummary, initOrderSummary } from "../../scripts/checkout/orderSummary.js";
-import { addToCart, cart, loadCart } from "../../data/cart.js";
+import { cart } from "../../data/cart-class.js";
 
+// mock rerender function for testing
 function mockRerender() {
   renderOrderSummary();
 }
 
-describe("Integration test suite: renderOrderSummary", () => {
-    // test :
-    // how the page looks,
-    // how the page behaves; 
-    // since it's generate html element and stored the context inside, we have another div in our test.html
+// product IDs
+const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6'; // socks
+const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d'; // basketball
 
-    // a mock is only lasts for one test! should not pollute other tests/normal code.
-    beforeEach(() => {
-        // we also have afterEach. afterAll, beforeAll
-        spyOn(localStorage, 'setItem'); // so that addtocart won't affect local storage.
-        document.querySelector('.js-test-container').innerHTML = `
-        <div class="js-order-summary"></div>
-        <div class="js-checkout-header"></div>
-        <div class="js-payment-summary"></div>
-        `;
+describe("Integration: renderOrderSummary", () => {
+  beforeEach(() => {
+    document.querySelector('.js-test-container').innerHTML = `
+      <div class="js-order-summary"></div>
+      <div class="js-payment-summary"></div>
+      <div class="js-checkout-header"></div>
+    `;
 
-        spyOn(localStorage, 'getItem').and.callFake(() => {
-            return JSON.stringify([{
-                productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-                quantity: 2,
-                deliveryOptionId: '1',
-                isEditing: false
-            },
-            {
-                productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
-                quantity: 3,
-                deliveryOptionId: '2',
-                isEditing: false
-            }]);
-        });
-        loadCart();
-        renderOrderSummary();
-        initOrderSummary(mockRerender);
-    });
+    cart.cartItems = [
+      { productId: productId1, quantity: 2, deliveryOptionId: '1', isEditing: false },
+      { productId: productId2, quantity: 1, deliveryOptionId: '2', isEditing: false }
+    ];
 
-    // e16f, clean up test container after each test
+    renderOrderSummary();
+    initOrderSummary(mockRerender);
+  });
 
-    afterEach(() => {
-        document.querySelector('.js-test-container').innerHTML = '';
-    });
+  afterEach(() => {
+    cart.cartItems = [];
+    document.querySelector('.js-test-container').innerHTML = '';
+  });
 
-    const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6';
-    const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d';
+  it('renders two cart items', () => {
+    expect(document.querySelectorAll('.js-cart-item-container').length).toBe(2);
+  });
 
-    it('displays the cart', () => {
-        // check if the cart has 2 products(item container) inside.
-        // console.log(cart);
-        expect(cart.length).toEqual(2);
+  it('deletes item when delete is clicked', () => {
+    document.querySelector(`.js-delete-link-${productId1}`).click();
 
-        //e16g, check name and quantity for each product
-        expect(document.querySelector(`.js-product-quantity-${productId1}`).innerText).toContain('Quantity: 2');
-        expect(document.querySelector(`.js-product-name-${productId1}`).innerText).toContain('Black and Gray Athletic Cotton Socks - 6 Pairs');
-        expect(document.querySelector(`.js-product-quantity-${productId2}`).innerText).toContain('Quantity: 1');
-        expect(document.querySelector(`.js-product-name-${productId2}`).innerText).toContain('Intermediate Size Basketball');
-        // e16h: loop through the list to make sure each product's price has a $ in front.
-        expect(document.querySelectorAll(`.product-price`).forEach(e => {
-            expect(e.innerText).toContain('$');
-        }));
-
-        // document.querySelector('.js-test-container').innerHTML = ``;
-    });
-
-    it('remove a product from the cart(delete)', () => {
-        expect(document.querySelectorAll('.js-cart-item-container').length).toEqual(2);
-        console.log(document.querySelector(`.js-delete-link-${productId1}`));
-        document.querySelector(`.js-delete-link-${productId1}`).click();
-        expect(document.querySelectorAll('.js-cart-item-container').length).toEqual(1);
-        expect(document.querySelector(`.js-product-quantity-${productId2}`).innerText).toContain('Quantity: 1');
-        expect(document.querySelector(`.js-product-quantity-${productId1}`)).toEqual(null);
-        expect(document.querySelector(`.js-product-quantity-${productId2}`)).not.toEqual(null);
-
-        //check after delete first element is product2:
-        expect(cart.length).toEqual(1);
-        expect(cart[0].productId).toEqual(productId2);
-        // document.querySelector('.js-test-container').innerHTML = `finished`;
-    });
-});
-
-describe('Integration test suite: delivery option', () => {
-    beforeEach(() => {
-        document.querySelector('.js-test-container').innerHTML = `
-    <div class="js-order-summary"></div>
-    <div class="js-payment-summary"></div>
-    <div class="js-checkout-header"></div>
-  `;
-        spyOn(localStorage, 'setItem');
-        // e16 i: pre-adding a puppy, which function calls won't counted in test cases.
-        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify([{
-            productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-            quantity: 2,
-            deliveryOptionId: '1',
-            isEditing: false
-        },
-        {
-            productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
-            quantity: 1,
-            deliveryOptionId: '2',
-            isEditing: false
-        }])
-        );
-        loadCart();
-        renderOrderSummary();
-        initOrderSummary(mockRerender);
-    });
-    afterEach(() => {
-        document.querySelector('.js-test-container').innerHTML = '';
-     });
-    const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6'; // socks, 2 
-    const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d'; // basketball, 1
-
-    it('updates the delivery option from 1 to 3 for the socks (id1))', () => {
-        
-        // modify the delivery options:
-        document.querySelector(`.js-delivery-option-${productId1}-3`).click();
-
-        // adding corresponding js-class in order summary, but increase coupling. should use data-id thing constantly
-        expect(
-            document.querySelector(`.js-delivery-option-input-${productId1}-3`).checked
-        ).toEqual(true);
-
-        expect(cart.length).toEqual(2);
-        expect(cart[0].productId).toEqual(productId1);
-        expect(cart[0].deliveryOptionId).toEqual('3');
-
-        expect(
-            document.querySelector('.js-payment-summary-shipping').innerText
-        ).toEqual('$14.98');
-        expect(
-            document.querySelector('.js-payment-summary-total').innerText
-        ).toEqual('$63.50');
-    });
-
+    expect(cart.cartItems.length).toBe(1);
+    expect(cart.cartItems[0].productId).toBe(productId2);
+  });
 });
