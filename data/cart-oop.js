@@ -3,8 +3,8 @@ function Cart(localStorageKey) {
     cartItems: undefined,
 
     // 专门负责初始化, oop using regular function(not arrow)
-    loadCart() {
-        this.cartItems = this.loadFromStorage(localStorageKey);
+    loadFromStorage() {
+        this.cartItems = this.loadFromStorageParse(localStorageKey);
         this.cartItems = this.cartItems ?? [
             {
                 productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
@@ -26,7 +26,7 @@ function Cart(localStorageKey) {
         localStorage.setItem(localStorageKey, JSON.stringify(this.cartItems));
     },
 
-    loadFromStorage(str) {
+    loadFromStorageParse(str) {
         return JSON.parse(localStorage.getItem(str));
     },
 
@@ -135,7 +135,7 @@ return cart;
 const cart2 = Cart('cart-oop');
 const businessCart2 = Cart('cart-business');
 
-cart2.loadCart();
+cart2.loadFromStorage();
 // check functions and log result as expected
 cart2.addToCart("0123");
 console.log(cart2);
@@ -143,7 +143,7 @@ console.log(cart2);
 
 // create multiple different cart via copy and paste, or a function; 
 // in PascalCase means it generate objects
-businessCart2.loadCart();
+businessCart2.loadFromStorage();
 console.log(businessCart2);
 
 

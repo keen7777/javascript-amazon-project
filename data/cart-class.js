@@ -15,13 +15,13 @@ class Cart {
     // name has to be constructor, and void, no return
     constructor(localStorageKey) {
         this.#localStorageKey = localStorageKey;
-        this.#loadCart();
+        this.#loadFromStorage();
     }
 
 
     // we could also add # to make it privated.
-    #loadCart() {
-        this.cartItems = this.loadFromStorage(this.#localStorageKey);
+    #loadFromStorage() {
+        this.cartItems = this.loadFromStorageParse(this.#localStorageKey);
         this.cartItems = this.cartItems ?? [
             {
                 productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
@@ -43,7 +43,7 @@ class Cart {
         localStorage.setItem(this.#localStorageKey, JSON.stringify(this.cartItems));
     }
 
-    loadFromStorage(str) {
+    loadFromStorageParse(str) {
         return JSON.parse(localStorage.getItem(str));
     }
 

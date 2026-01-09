@@ -21,8 +21,8 @@ if (!cart) {
 export let cart;
 
 // 专门负责初始化
-export function loadCart() {
-    const storedCart = loadFromStorage('cart');
+export function loadFromStorage() {
+    const storedCart = loadFromStorageParse('cart');
 
     cart = storedCart ?? [
         {
@@ -52,7 +52,7 @@ function saveToStorage() {
     localStorage.setItem('cart', JSON.stringify(cart));
 }
 
-function loadFromStorage(str) {
+function loadFromStorageParse(str) {
     return JSON.parse(localStorage.getItem(str));
 }
 
@@ -153,5 +153,18 @@ export function updateDeliveryOption(productId, deliveryOptionId) {
         matchingItem.deliveryOptionId = deliveryOptionId;
         saveToStorage();
     }
+}
 
+export function loadCart(fun) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.addEventListener('load', () => {
+    console.log(xhr.response);
+    console.log('loading old cart, not a class');
+    // just for practice, see the nesting
+    // that's a callback, a function to run in the future
+    fun();
+  });
+  xhr.open('GET', 'https://supersimplebackend.dev/cart');
+  xhr.send();
 }
