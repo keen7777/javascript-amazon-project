@@ -8,7 +8,7 @@ import { cart } from '../data/cart-class.js';
 // import '../data/car.js';
 
 //backend:
-// import '../data/backend-practice.js'
+import '../data/backend-practice.js'
 
 export function rerenderCheckoutPage() {
   renderOrderSummary();
