@@ -11,18 +11,20 @@
 // import * as cartModule from '../data/cart.js';
 
 
-import {cart} from '../data/cart-class.js';
+import { cart } from '../data/cart-class.js';
 // import { cart, addToCart, calculateCartQuantity,loadCart } from '../data/cart.js';
-import { products } from '../data/products.js';
-import { formatCurrency } from './utils/money.js';
+import { products, loadProducts } from '../data/products.js';
 import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
-// loadCart();
-let productsHTML = '';
-// loop through the product array and create single product's html
-products.forEach((product) => {
-  // accumulator Pattern
-  productsHTML = productsHTML + `
+loadProducts(renderProductsGrid);
+
+function renderProductsGrid() {
+  // loadCart();
+  let productsHTML = '';
+  // loop through the product array and create single product's html
+  products.forEach((product) => {
+    // accumulator Pattern
+    productsHTML = productsHTML + `
         <div class="product-container">
           <div class="product-image-container">
             <img class="product-image"
@@ -73,46 +75,46 @@ products.forEach((product) => {
             Add to Cart
           </button>
         </div> `;
-});
-
-// console.log(productsHTML);
-document.querySelector('.js-products-grid').innerHTML = productsHTML;
-// update UI and calculate current item amount:
-const quantity = cart.calculateCartQuantity(cart);
-updateCartQuantityDisplay(quantity);
-
-
-// exercise 13 challenge
-let addedMessageTimeoutId;
-
-
-
-// interaction of add to cart button，debug, refresh the exactly timeout, not the previous one. 
-const addedMessageTimeouts = {}; // store timeout per product
-
-document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
-  button.addEventListener('click', () => {
-    const { productId } = button.dataset;
-
-    cart.addToCart(productId);
-
-    const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
-    addToCartSelector.classList.add('added-to-cart-seen');
-
-    // clear previous timeout for this product only
-    if (addedMessageTimeouts[productId]) {
-      clearTimeout(addedMessageTimeouts[productId]);
-    }
-
-    // set new timeout for this product
-    addedMessageTimeouts[productId] = setTimeout(() => {
-      addToCartSelector.classList.remove('added-to-cart-seen');
-      delete addedMessageTimeouts[productId]; // clean up
-    }, 2000);
-
-    // update total cart quantity
-    const quantity = cart.calculateCartQuantity(cart.cartItems);
-    updateCartQuantityDisplay(quantity);
   });
-});
 
+  // console.log(productsHTML);
+  document.querySelector('.js-products-grid').innerHTML = productsHTML;
+  // update UI and calculate current item amount:
+  const quantity = cart.calculateCartQuantity(cart);
+  updateCartQuantityDisplay(quantity);
+
+
+  // exercise 13 challenge
+  let addedMessageTimeoutId;
+
+
+
+  // interaction of add to cart button，debug, refresh the exactly timeout, not the previous one. 
+  const addedMessageTimeouts = {}; // store timeout per product
+
+  document.querySelectorAll('.js-added-to-cart-button').forEach((button) => {
+    button.addEventListener('click', () => {
+      const { productId } = button.dataset;
+
+      cart.addToCart(productId);
+
+      const addToCartSelector = document.querySelector(`.js-added-to-cart-${productId}`);
+      addToCartSelector.classList.add('added-to-cart-seen');
+
+      // clear previous timeout for this product only
+      if (addedMessageTimeouts[productId]) {
+        clearTimeout(addedMessageTimeouts[productId]);
+      }
+
+      // set new timeout for this product
+      addedMessageTimeouts[productId] = setTimeout(() => {
+        addToCartSelector.classList.remove('added-to-cart-seen');
+        delete addedMessageTimeouts[productId]; // clean up
+      }, 2000);
+
+      // update total cart quantity
+      const quantity = cart.calculateCartQuantity(cart.cartItems);
+      updateCartQuantityDisplay(quantity);
+    });
+  });
+};

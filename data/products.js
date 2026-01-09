@@ -123,6 +123,8 @@ export class Appliance extends Product {
   }
 }
 
+// L18 load all products from backend.
+/* 
 export const products = [
   {
     id: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
@@ -822,8 +824,9 @@ export const products = [
   }
 
 });
+console.log(products);
+ */
 
-// console.log(products);
 
 /*
 //built in class:
@@ -859,3 +862,32 @@ object1.method();
 // using arrow function, do not change the value of 'this'
 
 */
+
+// L18 
+export let products = [];
+
+export function loadProducts(fun) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.addEventListener('load', () => {
+    products = JSON.parse(xhr.response).map((productDetails) => {
+      // here the type is a discriminator property
+      if (productDetails.type === 'clothing') {
+        return new Clothing(productDetails);
+      } else if (productDetails.type === 'appliance') {
+        return new Appliance(productDetails);
+      }
+      else {
+        return new Product(productDetails);
+      }
+
+    });
+    console.log('load products');
+    // run a function, here it's the products grid as we finished the request from backend
+    // that's a callback, a function to run in the future
+    fun();
+  });
+  xhr.open('GET', 'https://supersimplebackend.dev/products');
+  xhr.send();
+}
+
