@@ -1,5 +1,6 @@
 import { renderOrderSummary, initOrderSummary } from "../../scripts/checkout/orderSummary.js";
 import { cart } from "../../data/cart-class.js";
+import { loadProducts } from "../../data/products.js";
 
 // mock rerender function for testing
 function mockRerender() {
@@ -10,7 +11,13 @@ function mockRerender() {
 const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6'; // socks
 const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d'; // basketball
 
+// wait till loadProducts() is done, then we continue with rest code
 describe("Integration: renderOrderSummary", () => {
+  beforeAll((done) => {
+    loadProducts();
+    done();
+  });
+
   beforeEach(() => {
     document.querySelector('.js-test-container').innerHTML = `
       <div class="js-order-summary"></div>
