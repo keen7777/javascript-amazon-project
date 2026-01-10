@@ -18,9 +18,26 @@ export function rerenderCheckoutPage() {
   renderCheckoutHeader();
 }
 
+//await for async code: shortcut for promise, 
+// await let us wait till a promise done, then continue the next step: await = using .then(()=>{...})
+// this keyword makes a fun return a promise, same as new Promise ...grammary
+async function loadPage() {
+  // we can only using await inside async funvtions
+  await loadProductsFetch();
+  const value = await new Promise((resolve) => {
+    loadCart(() => {
+      resolve('async, resolve');// resolve go first then render... funs.
+    });
+  });
+  rerenderCheckoutPage();
+  initOrderSummary(rerenderCheckoutPage);
+}
+
+loadPage();
+
 // much more clear as each step has been flattened, and using then as conjunction.
 // using Promise.all, run multiple at onece. and wait for all of them to finish before continue next step.
-
+/** using fetch
 Promise.all([
   // new version
   loadProductsFetch(),
@@ -35,9 +52,9 @@ Promise.all([
   rerenderCheckoutPage();
   initOrderSummary(rerenderCheckoutPage);
 });
+*/
 
-/**
- * using xhr and promise
+/** using xhr and promise
 Promise.all([
   new Promise((resolve) => {
     loadProducts(() => {
@@ -89,7 +106,7 @@ new Promise((resolve) => {
 
 // comparing with nesting callbacks:
 
-/* !!!
+/* !!! nested call back
 loadProducts(() => {
   loadCart(() => {
     rerenderCheckoutPage();
@@ -99,7 +116,7 @@ loadProducts(() => {
 */
 
 
-/* !!!
+/* !!! call back
 loadProducts(() => {
   // 1. 首次渲染
   rerenderCheckoutPage();
