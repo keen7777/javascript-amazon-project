@@ -870,6 +870,7 @@ export let products = [];
 export function loadProductsFetch() {
   // whatever we fetch, go to response
   const promise = fetch(
+    // 'https://error.supersimplebackend.dev/products'
     'https://supersimplebackend.dev/products'
   ).then((response) => {
     // response = a complex package that contain everything.
@@ -890,9 +891,14 @@ export function loadProductsFetch() {
 
     });
     console.log('load products');
+  }).catch((error) => {
+    // use catch for error in promise
+    console.log('Fetch: unexpected error. Please try again later')
+    console.log(error);
   });
   return promise;
 }
+// loadProductsFetch();
 
 /* just for practice 
 loadProductsFetch().then(() =>{
@@ -920,7 +926,18 @@ export function loadProducts(fun) {
     // that's a callback, a function to run in the future
     fun();
   });
+
+  // add a seperate callback for error handle
+  xhr.addEventListener('error',() =>{
+    console.log('XHR: unexpected error. Please try again later')
+  });
   xhr.open('GET', 'https://supersimplebackend.dev/products');
+  // xhr.open('GET', 'https://error.supersimplebackend.dev/products');
   xhr.send();
 }
 
+/** 
+loadProducts(()=>{
+  console.log('just as placeholder for loadProducts param');
+});
+*/

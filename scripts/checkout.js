@@ -23,12 +23,26 @@ export function rerenderCheckoutPage() {
 // this keyword makes a fun return a promise, same as new Promise ...grammary
 async function loadPage() {
   // we can only using await inside async funvtions
-  await loadProductsFetch();
-  const value = await new Promise((resolve) => {
-    loadCart(() => {
-      resolve('async, resolve');// resolve go first then render... funs.
+
+  // using try catch for error handle:
+  try {
+    // create error via throw:
+    // throw new Error("using throw error");
+
+    await loadProductsFetch();
+    // we can't throw an error in the future, hence 2nd param reject
+    const value = await new Promise((resolve, reject) => {
+      loadCart(() => {
+        // reject('error: reject!')
+        resolve('async, resolve');// resolve go first then render... funs.
+      });
     });
-  });
+  } catch (error) {
+    // remember only catch once for the closest method, then it won't bubble out.
+    // catch will skip the next code, go directly to catch scoop
+    console.log("async await: Unexpected error.");
+    console.log(error);
+  }
   rerenderCheckoutPage();
   initOrderSummary(rerenderCheckoutPage);
 }
