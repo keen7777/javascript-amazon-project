@@ -88,5 +88,12 @@
         </div>
       </div>
     </div>
+
+    <script>
+      // URL param let us save different data in each URL
+      const url = new URL(window.location.href);
+      console.log(url.searchParams.get('orderId'));
+      console.log(url.searchParams.get('productId'));
+    </script>
   </body>
 </html>
