@@ -2,7 +2,6 @@ import { renderOrderSummary, initOrderSummary } from './checkout/orderSummary.js
 import { renderPaymentSummary } from './checkout/paymentSummary.js';
 import { renderCheckoutHeader } from './checkout/checkoutHeader.js';
 // checking oop version of the code:
-// import '../data/cart-oop.js';
 // import '../data/cart-class.js';
 // import '../data/car.js';
 
@@ -11,7 +10,7 @@ import { loadCart } from '../data/cart.js';
 
 // backend:
 // import '../data/backend-practice.js'
-import { loadProducts } from '../data/products.js';
+import { loadProducts, loadProductsFetch } from '../data/products.js';
 
 export function rerenderCheckoutPage() {
   renderOrderSummary();
@@ -22,6 +21,23 @@ export function rerenderCheckoutPage() {
 // much more clear as each step has been flattened, and using then as conjunction.
 // using Promise.all, run multiple at onece. and wait for all of them to finish before continue next step.
 
+Promise.all([
+  // new version
+  loadProductsFetch(),
+  new Promise((resolve) => {
+    loadCart(() => {
+      resolve('value2 : loadCart fun');// resolve go first then render... funs.
+    });
+  })
+
+]).then((values) => {
+  console.log(values);
+  rerenderCheckoutPage();
+  initOrderSummary(rerenderCheckoutPage);
+});
+
+/**
+ * using xhr and promise
 Promise.all([
   new Promise((resolve) => {
     loadProducts(() => {
@@ -39,7 +55,7 @@ Promise.all([
   rerenderCheckoutPage();
   initOrderSummary(rerenderCheckoutPage);
 });
-
+ */
 
 ///////////////////////////
 /*

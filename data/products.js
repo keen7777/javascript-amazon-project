@@ -866,6 +866,39 @@ object1.method();
 // L18 
 export let products = [];
 
+// better version, fetch using promise
+export function loadProductsFetch() {
+  // whatever we fetch, go to response
+  const promise = fetch(
+    'https://supersimplebackend.dev/products'
+  ).then((response) => {
+    // response = a complex package that contain everything.
+    // .json() also gives a promise, the return value go to productsData
+    return response.json();
+
+  }).then((productsData) => {
+    products = productsData.map((productDetails) => {
+      // here the type is a discriminator property
+      if (productDetails.type === 'clothing') {
+        return new Clothing(productDetails);
+      } else if (productDetails.type === 'appliance') {
+        return new Appliance(productDetails);
+      }
+      else {
+        return new Product(productDetails);
+      }
+
+    });
+    console.log('load products');
+  });
+  return promise;
+}
+
+/* just for practice 
+loadProductsFetch().then(() =>{
+  console.log('next step: after the fetch and mapping data to array');
+});
+*/
 export function loadProducts(fun) {
   const xhr = new XMLHttpRequest();
 
@@ -882,7 +915,7 @@ export function loadProducts(fun) {
       }
 
     });
-    console.log('load products');
+    console.log('load products using xhr');
     // run a function, here it's the products grid as we finished the request from backend
     // that's a callback, a function to run in the future
     fun();

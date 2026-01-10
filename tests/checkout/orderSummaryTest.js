@@ -1,6 +1,6 @@
 import { renderOrderSummary, initOrderSummary } from "../../scripts/checkout/orderSummary.js";
 import { cart } from "../../data/cart-class.js";
-import { loadProducts } from "../../data/products.js";
+import { loadProducts, loadProductsFetch } from "../../data/products.js";
 
 // mock rerender function for testing
 function mockRerender() {
@@ -14,8 +14,9 @@ const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d'; // basketball
 // wait till loadProducts() is done, then we continue with rest code
 describe("Integration: renderOrderSummary", () => {
   beforeAll((done) => {
-    loadProducts();
-    done();
+    loadProductsFetch().then(() => {
+      done();
+    });
   });
 
   beforeEach(() => {
