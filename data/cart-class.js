@@ -22,20 +22,7 @@ class Cart {
     // we could also add # to make it privated.
     #loadFromStorage() {
         this.cartItems = this.loadFromStorageParse(this.#localStorageKey);
-        this.cartItems = this.cartItems ?? [
-            {
-                productId: 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6',
-                quantity: 2,
-                deliveryOptionId: '1',
-                isEditing: false
-            },
-            {
-                productId: '15b6fc6f-327a-4ec4-896f-486349e85a3d',
-                quantity: 1,
-                deliveryOptionId: '2',
-                isEditing: false
-            }
-        ];
+        this.cartItems = this.cartItems ?? [];
     }
 
     // local storage
@@ -151,31 +138,28 @@ class Cart {
         item.isEditing = isEditing;
     }
 
+    // for generating order:
+
+    getCartSnapshotForOrder() {
+        return this.cartItems.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            deliveryOptionId: item.deliveryOptionId
+        }));
+    }
+
+    //for order clearCart:
+    clearCart(){
+        this.cartItems = [];
+        this.saveToStorage();
+    }
+
 }
 
 
-/*
-const cart2 = new Cart();
-const businessCart2 = new Cart();
-cart2.localStorageKey = 'cart-oops-class'
-businessCart2.localStorageKey = 'cart-business-class'
-
-cart2.loadCart();
-// check functions and log result as expected
-cart2.addToCart("54e0eccd-8f36-462b-b68a-8182611d9add");
-cart2.addToCart("0123");
-console.log(cart2);
-
-// create multiple different cart via copy and paste, or a function; 
-// in PascalCase means it generate objects
-businessCart2.loadCart();
-businessCart2.addToCart("0123");
-console.log(businessCart2);
-console.log(businessCart2 instanceof Cart);
-*/
 
 // use constuctor:
-export const cart = new Cart('cart-oop');
-console.log(cart);
+export const cart = new Cart('cart-class');
+
 
 

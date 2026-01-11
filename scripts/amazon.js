@@ -10,13 +10,13 @@
 // import {cart as myCart} from '../data/cart.js';
 // import * as cartModule from '../data/cart.js';
 
-
 import { cart } from '../data/cart-class.js';
 // import { cart, addToCart, calculateCartQuantity,loadCart } from '../data/cart.js';
-import { products, loadProducts } from '../data/products.js';
+import { products, loadProductsFetch } from '../data/products.js';
 import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
-loadProducts(renderProductsGrid);
+
+loadProductsFetch(renderProductsGrid);
 
 function renderProductsGrid() {
   // loadCart();

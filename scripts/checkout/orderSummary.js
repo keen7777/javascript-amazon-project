@@ -135,8 +135,6 @@ export function renderOrderSummary() {
   }
 
   document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
-  // put quantity update here: 
-  // renderCheckoutHeader();
 }
 
 
@@ -245,5 +243,7 @@ function getEditingProductContainer() {
 // Save / Enter → 处理数据
 // Update → 初始化 input
 // Escape → 纯 UI 状态切换
+
+
 
 

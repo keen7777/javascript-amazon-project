@@ -2,19 +2,44 @@ import { renderOrderSummary, initOrderSummary } from './checkout/orderSummary.js
 import { renderPaymentSummary } from './checkout/paymentSummary.js';
 import { renderCheckoutHeader } from './checkout/checkoutHeader.js';
 // checking oop version of the code:
-// import '../data/cart-class.js';
+import { cart } from '../data/cart-class.js';
+import { addOrder } from '../data/orders.js';
 
-
-// problem of callback:
+// load using backend
 import { loadCartFetch } from '../data/cart.js';
-
-// backend:
-// import '../data/backend-practice.js'
 import { loadProductsFetch } from '../data/products.js';
+
+import { createOrderFromCart } from './orderFactory.js';
+import { updateCartQuantityDisplay } from '../ui/modifyCart.js';
+
+
+export function placeOrder() {
+  try {
+    // 1, create order snapshot
+    const order = createOrderFromCart();
+
+    // 2, save orders
+    addOrder(order);
+
+    // 3, cart clear
+    cart.clearCart();
+
+    // 4. update cart quantity on right up corner
+    updateCartQuantityDisplay(cart.calculateCartQuantity());
+
+    // jump to
+    window.location.href = 'orders.html';
+
+  } catch (error) {
+    console.log('Place order failed.');
+    console.log(error);
+  }
+}
+
 
 export function rerenderCheckoutPage() {
   renderOrderSummary();
-  renderPaymentSummary();
+  renderPaymentSummary(placeOrder);
   renderCheckoutHeader();
 }
 
@@ -25,9 +50,6 @@ async function loadPage() {
   // we can only using await inside async funvtions
   // using try catch for error handle:
   try {
-
-    await loadProductsFetch();
-    await loadCartFetch();
     await Promise.all([
       loadProductsFetch(),
       loadCartFetch()

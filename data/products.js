@@ -792,9 +792,9 @@ console.log(products);
 export let products = [];
 
 // better version, fetch using promise
-export function loadProductsFetch() {
+export  async function loadProductsFetch(fun) {
   // whatever we fetch, go to response
-  const promise = fetch(
+   const promise =  await fetch(
     'https://supersimplebackend.dev/products'
   ).then((response) => {
     // response = a complex package that contain everything.
@@ -820,6 +820,7 @@ export function loadProductsFetch() {
     console.log('Fetch: unexpected error. Please try again later')
     console.log(error);
   });
+  fun();
   return promise;
 }
 

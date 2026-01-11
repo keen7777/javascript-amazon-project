@@ -11,6 +11,10 @@ export function getDeliveryOption(deliveryOptionId) {
   return deliveryOption || deliveryOptions[0];
 }
 
+export function getOrderPlacedTime() {
+  return dayjs().format('MMMM D');
+}
+
 // E15,l 
 export function calculateDeliveryDate(deliveryOption) {
   // 从配送方式列表中，找到当前商品已选择的那一种
