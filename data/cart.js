@@ -155,16 +155,16 @@ export function updateDeliveryOption(productId, deliveryOptionId) {
     }
 }
 
-export function loadCart(fun) {
-  const xhr = new XMLHttpRequest();
-
-  xhr.addEventListener('load', () => {
-    console.log(xhr.response);
-    console.log('loading old cart, not a class');
-    // just for practice, see the nesting
-    // that's a callback, a function to run in the future
-    fun();
-  });
-  xhr.open('GET', 'https://supersimplebackend.dev/cart');
-  xhr.send();
+export async function loadCartFetch() {
+    // whatever we fetch, go to response
+    try {
+        const response = await fetch('https://supersimplebackend.dev/cart');
+        const text = await response.text();
+        console.log(`in loadCartFetch function : ${text}`);
+        return text;
+    } catch (error) {
+        // use catch for error in promise
+        console.log('Fetch: unexpected error. Please try again later')
+        console.log(error);
+    }
 }

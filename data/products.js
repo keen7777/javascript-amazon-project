@@ -59,46 +59,6 @@ export class Clothing extends Product {
   }
 
 }
-/*
-const tshirt = new Clothing({
-  id: "83d4ca15-0f35-48f5-b7a3-1ea210004f2e",
-  image: "images/products/adults-plain-cotton-tshirt-2-pack-teal.jpg",
-  name: "Adults Plain Cotton T-Shirt - 2 Pack",
-  rating: {
-    stars: 4.5,
-    count: 56
-  },
-  priceCents: 799,
-  keywords: [
-    "tshirts",
-    "apparel",
-    "mens"
-  ],
-  type: "clothing",
-  sizeChartLink: "images/clothing-size-chart.png"
-});
-console.log(tshirt);
-console.log(tshirt.getPrice());
-*/
-/*
-// this is an illustration
-const product1 = new Product({
-  id: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
-  image: "images/products/athletic-cotton-socks-6-pairs.jpg",
-  name: "Black and Gray Athletic Cotton Socks - 6 Pairs",
-  rating: {
-    stars: 4.5,
-    count: 87
-  },
-  priceCents: 1090,
-  keywords: [
-    "socks",
-    "sports",
-    "apparel"
-  ]
-});
-console.log(product1);
-*/
 
 export class Appliance extends Product {
   instructionLink;
@@ -828,41 +788,6 @@ console.log(products);
  */
 
 
-/*
-//built in class:
-const date = new Date();
-console.log(date);
-console.log(date.toLocaleDateString());
-
-// 'this' is normally for outer object for point to inside function, 
-// original JS, this = on our current window, nothing to point -> give us undfined
-// modules -> inside module, but outside of a function, undefined
-console.log(this);
-
-// use this inside a function:
-function logThis() {
-  console.log(this);
-}
-
-logThis();
-// but with call, we can modify this
-logThis.call('hello, 42');
-
-// arrow function can't change this!!!! to avoid accidentally overriding this,( forEach)
-const object1 = {
-  method: () => {
-    console.log(this);
-  }
-}
-object1.method();
-
-// summary of this:
-// inside method(a variable/const...), this -> outer object
-// inside a function, this = undefined, use .call to change it as we wish
-// using arrow function, do not change the value of 'this'
-
-*/
-
 // L18 
 export let products = [];
 
@@ -870,7 +795,6 @@ export let products = [];
 export function loadProductsFetch() {
   // whatever we fetch, go to response
   const promise = fetch(
-    // 'https://error.supersimplebackend.dev/products'
     'https://supersimplebackend.dev/products'
   ).then((response) => {
     // response = a complex package that contain everything.
@@ -898,46 +822,4 @@ export function loadProductsFetch() {
   });
   return promise;
 }
-// loadProductsFetch();
 
-/* just for practice 
-loadProductsFetch().then(() =>{
-  console.log('next step: after the fetch and mapping data to array');
-});
-*/
-export function loadProducts(fun) {
-  const xhr = new XMLHttpRequest();
-
-  xhr.addEventListener('load', () => {
-    products = JSON.parse(xhr.response).map((productDetails) => {
-      // here the type is a discriminator property
-      if (productDetails.type === 'clothing') {
-        return new Clothing(productDetails);
-      } else if (productDetails.type === 'appliance') {
-        return new Appliance(productDetails);
-      }
-      else {
-        return new Product(productDetails);
-      }
-
-    });
-    console.log('load products using xhr');
-    // run a function, here it's the products grid as we finished the request from backend
-    // that's a callback, a function to run in the future
-    fun();
-  });
-
-  // add a seperate callback for error handle
-  xhr.addEventListener('error',() =>{
-    console.log('XHR: unexpected error. Please try again later')
-  });
-  xhr.open('GET', 'https://supersimplebackend.dev/products');
-  // xhr.open('GET', 'https://error.supersimplebackend.dev/products');
-  xhr.send();
-}
-
-/** 
-loadProducts(()=>{
-  console.log('just as placeholder for loadProducts param');
-});
-*/
