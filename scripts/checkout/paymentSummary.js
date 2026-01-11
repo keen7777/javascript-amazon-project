@@ -75,7 +75,7 @@ export function renderPaymentSummary() {
         body: JSON.stringify({
           cart: cart
         })
-      }) //fetch end
+      }); //fetch end
 
       const order = await response.json();
       addOrder(order);
