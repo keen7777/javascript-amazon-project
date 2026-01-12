@@ -24,12 +24,11 @@ export function createOrderFromCart() {
         // order page don't have weekdays' name.
         const currentProductDeliveryDateString = calculateDeliveryDate(currentProductDeliveryOption);
         orderItemsInfo.push({
+            productId: currentProductId,
             name: currentProductName, 
             image: currentProductImage, 
             deliveryDate: currentProductDeliveryDateString, 
             quantity: currentProductQuantity,
-            trackId : '000',
-            productId: currentProductId,
             deliveryOptionId: currentProductDeliveryOptionId
         });
     });

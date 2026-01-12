@@ -65,7 +65,7 @@ describe('Function test suite: removeFromCart', () => {
         cart.removeFromCart('0123');
         expect(cart.cartItems.length).toBe(0);
         expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-        expect(localStorage.setItem).toHaveBeenCalledWith('cart-oop', JSON.stringify([]));
+        expect(localStorage.setItem).toHaveBeenCalledWith('cart-class', JSON.stringify([]));
     });
 
     it('remove a productId that is not in the cart', () => {

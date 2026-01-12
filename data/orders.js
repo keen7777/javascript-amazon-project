@@ -47,6 +47,7 @@ export function renderOrdersGrid(orders) {
       return '';
     }
     itemsInOrder.forEach(item => {
+      console.log('!!!!!!order item:', item);
       productsInOrderHTML = productsInOrderHTML +
         `<div class="product-image-container">
               <img src="${item.image}">
@@ -71,8 +72,9 @@ export function renderOrdersGrid(orders) {
             </div>
 
             <div class="product-actions">
-              <a href="tracking.html?orderId=123productId=456">
-                <button class="track-package-button button-secondary js-track-package-button">
+              <a href="tracking.html?orderId=${currentOrder.orderId}&productId=${item.productId}">
+                <button class="track-package-button button-secondary js-track-package-button"
+                data-product-id="${item.productId}">
                   Track package
                 </button>
               </a>
@@ -100,28 +102,12 @@ export function renderOrdersGrid(orders) {
       // 处理按钮显示 "added"
       const messageSpan = btn.querySelector('.js-buy-again-message');
       messageSpan.textContent = 'Added';
-      btn.disabled = true;
+      // btn.disabled = true;
 
       setTimeout(() => {
         messageSpan.textContent = 'Buy it again';
-        btn.disabled = false;
+        // btn.disabled = false;
       }, 2000);
-    });
-  });
-
-  const trackButtons = document.querySelectorAll('.js-track-package-button');
-  trackButtons.forEach((btn, index) => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const orderItem = orders
-        .flatMap(order => order.orderItemsInfo)[index];
-      const orderId = orders.find(order =>
-        order.orderItemsInfo.includes(orderItem)
-      )?.orderId;
-
-      if (!orderId) return;
-      // 跳转到对应 tracking 页面，带上 query 参数
-      window.location.href = `tracking.html?orderId=${orderId}&productName=${encodeURIComponent(orderItem.name)}`;
     });
   });
 };
@@ -155,3 +141,7 @@ export function loadOrders() {
   );
 }
 
+export function getAnOrder(orderId) {
+  const orders = loadOrders();
+  return orders.find(order => order.orderId === orderId) || null;
+}
