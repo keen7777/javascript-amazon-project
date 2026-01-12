@@ -15,6 +15,8 @@ export function createOrderFromCart() {
 
     const orderItemsInfo = [];
     cartItemsInfo.forEach(cartItem => {
+        const currentProductId = cartItem.productId;
+        const currentProductDeliveryOptionId = cartItem.deliveryOptionId;
         const currentProductImage = getProduct(cartItem.productId).image;
         const currentProductName = getProduct(cartItem.productId).name;
         const currentProductQuantity = cartItem.quantity;
@@ -26,7 +28,9 @@ export function createOrderFromCart() {
             image: currentProductImage, 
             deliveryDate: currentProductDeliveryDateString, 
             quantity: currentProductQuantity,
-            trackId : '000'
+            trackId : '000',
+            productId: currentProductId,
+            deliveryOptionId: currentProductDeliveryOptionId
         });
     });
 

@@ -1,5 +1,7 @@
 import { createOrderFromCart } from "../scripts/orderFactory.js";
-// loadOrders(renderOrdersGrid);
+import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
+import { cart } from "./cart-class.js";
+
 
 export function renderOrdersGrid(orders) {
   let ordersHTML = '';
@@ -33,6 +35,8 @@ export function renderOrdersGrid(orders) {
         </div>`;
   });
 
+
+
   // function to create purchased items Html
   function createProductsInOrderHTML(currentOrder) {
 
@@ -58,15 +62,17 @@ export function renderOrdersGrid(orders) {
               <div class="product-quantity">
                 Quantity: ${item.quantity}
               </div>
-              <button class="buy-again-button button-primary">
+              <button class="buy-again-button button-primary js-buy-again-button"
+                data-product-id="${item.productId}"
+                data-delivery-option-id="${item.deliveryOptionId}">
                 <img class="buy-again-icon" src="images/icons/buy-again.png">
-                <span class="buy-again-message">Buy it again</span>
+                <span class="buy-again-message js-buy-again-message">Buy it again</span>
               </button>
             </div>
 
             <div class="product-actions">
               <a href="tracking.html?orderId=123productId=456">
-                <button class="track-package-button button-secondary">
+                <button class="track-package-button button-secondary js-track-package-button">
                   Track package
                 </button>
               </a>
@@ -78,6 +84,46 @@ export function renderOrdersGrid(orders) {
 
   // console.log(ordersHTML);
   document.querySelector('.js-orders-grid').innerHTML = ordersHTML;
+
+  // --- event delegation ---
+  const buyAgainButtons = document.querySelectorAll('.js-buy-again-button');
+  buyAgainButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const productId = btn.dataset.productId;
+      const deliveryOptionId = btn.dataset.deliveryOptionId;
+      if (!productId) return;
+
+      // add to cart
+      cart.addToCart(productId);
+      updateCartQuantityDisplay(cart.calculateCartQuantity(cart));
+
+      // 处理按钮显示 "added"
+      const messageSpan = btn.querySelector('.js-buy-again-message');
+      messageSpan.textContent = 'Added';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        messageSpan.textContent = 'Buy it again';
+        btn.disabled = false;
+      }, 2000);
+    });
+  });
+
+  const trackButtons = document.querySelectorAll('.js-track-package-button');
+  trackButtons.forEach((btn, index) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const orderItem = orders
+        .flatMap(order => order.orderItemsInfo)[index];
+      const orderId = orders.find(order =>
+        order.orderItemsInfo.includes(orderItem)
+      )?.orderId;
+
+      if (!orderId) return;
+      // 跳转到对应 tracking 页面，带上 query 参数
+      window.location.href = `tracking.html?orderId=${orderId}&productName=${encodeURIComponent(orderItem.name)}`;
+    });
+  });
 };
 
 
