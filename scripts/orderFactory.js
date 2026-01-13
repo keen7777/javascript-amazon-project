@@ -1,7 +1,9 @@
 import { calculateTotalCostForOrder } from "./checkout/paymentSummary.js";
-import { getDeliveryOption, getOrderPlacedTime,calculateDeliveryDate } from "../data/deliveryOptions.js";
+import { getDeliveryOption, getOrderPlacedTime,calculateDeliveryTime } from "../data/deliveryOptions.js";
 import { cart } from "../data/cart-class.js";
 import { getProduct } from "../data/products.js";
+import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
+
 // use all the function to get order infos:
 // 1, cart, quantity, productid to get 2, from cart-class.js
 // 2, product pic, name, from products.js
@@ -22,12 +24,14 @@ export function createOrderFromCart() {
         const currentProductQuantity = cartItem.quantity;
         const currentProductDeliveryOption = getDeliveryOption(cartItem.deliveryOptionId);
         // order page don't have weekdays' name.
-        const currentProductDeliveryDateString = calculateDeliveryDate(currentProductDeliveryOption);
+        const currentProductDeliveryTime = calculateDeliveryTime(currentProductDeliveryOption);
+        const currentProductDeliveryDateString = dayjs(currentProductDeliveryTime).format('MMMM D');
         orderItemsInfo.push({
             productId: currentProductId,
             name: currentProductName, 
             image: currentProductImage, 
             deliveryDate: currentProductDeliveryDateString, 
+            deliveryTime: currentProductDeliveryTime, 
             quantity: currentProductQuantity,
             deliveryOptionId: currentProductDeliveryOptionId
         });

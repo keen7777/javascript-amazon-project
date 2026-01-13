@@ -11,18 +11,34 @@
 // import * as cartModule from '../data/cart.js';
 
 import { cart } from '../data/cart-class.js';
-// import { cart, addToCart, calculateCartQuantity,loadCart } from '../data/cart.js';
-import { products, loadProductsFetch } from '../data/products.js';
+import { products, loadProductsFetch,filterProductsBySearch } from '../data/products.js';
 import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 
+await loadProductsFetch();
+renderProductsGrid(products);
 
-loadProductsFetch(renderProductsGrid);
+const searchInput = document.querySelector('.js-search-bar');
+const searchButton = document.querySelector('.js-search-button');
 
-function renderProductsGrid() {
+searchButton.addEventListener('click', () => {
+  const searchText = searchInput.value;
+  const filteredProducts = filterProductsBySearch(products, searchText);
+  console.log(searchText);
+  renderProductsGrid(filteredProducts);
+});
+
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    searchButton.click();
+  }
+});
+
+
+function renderProductsGrid(filteredProducts) {
   // loadCart();
   let productsHTML = '';
   // loop through the product array and create single product's html
-  products.forEach((product) => {
+  filteredProducts.forEach((product) => {
     // accumulator Pattern
     productsHTML = productsHTML + `
         <div class="product-container">
@@ -86,8 +102,6 @@ function renderProductsGrid() {
 
   // exercise 13 challenge
   let addedMessageTimeoutId;
-
-
 
   // interaction of add to cart button，debug, refresh the exactly timeout, not the previous one. 
   const addedMessageTimeouts = {}; // store timeout per product

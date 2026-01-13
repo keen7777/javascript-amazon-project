@@ -1,7 +1,7 @@
 import { createOrderFromCart } from "../scripts/orderFactory.js";
 import { updateCartQuantityDisplay } from "../ui/modifyCart.js";
 import { cart } from "./cart-class.js";
-
+import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 
 export function renderOrdersGrid(orders) {
   let ordersHTML = '';
@@ -15,7 +15,7 @@ export function renderOrdersGrid(orders) {
             <div class="order-header-left-section">
               <div class="order-date js-order-date">
                 <div class="order-header-label">Order Placed:</div>
-                <div>${currentOrder.placedOrderTime}</div>
+                <div>${dayjs(currentOrder.placedOrderTime).format('MMMM D')}</div>
               </div>
               <div class="order-total">
                 <div class="order-header-label">Total:</div>

@@ -6,7 +6,7 @@ import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 // load from external library:always load them first before your own code
 // we'd prefer esm version to avoid naming conflicts
 // use DayJS external library to handle delivery options.(always been minification for smaller data size)
-import { deliveryOptions, getDeliveryOption, calculateDeliveryDate } from '../../data/deliveryOptions.js';
+import { deliveryOptions, getDeliveryOption, calculateDeliveryTime } from '../../data/deliveryOptions.js';
 
 
 // from 14 import
@@ -56,7 +56,9 @@ export function renderOrderSummary() {
     // abstract it as a function in deliveryoptions.js
     const deliveryOptionId = cartItem.deliveryOptionId;
     const deliveryOption = getDeliveryOption(deliveryOptionId);
-    const dateString = calculateDeliveryDate(deliveryOption);
+    // modify via dayjs to get tracking interactive
+    const dateTime = calculateDeliveryTime(deliveryOption);
+    const dateString = dayjs(dateTime).format('dddd, MMMM D');
 
     // console.log(matchingProduct);
     cartSummaryHTML = cartSummaryHTML +
@@ -111,7 +113,9 @@ export function renderOrderSummary() {
     let html = '';
 
     deliveryOptions.forEach((deliveryOption) => {
-      const dateString = calculateDeliveryDate(deliveryOption);
+      const dateTime = calculateDeliveryTime(deliveryOption);
+      const dateString = dayjs(dateTime).format('dddd, MMMM D');
+      
       // if 0, then Free shipping else show price
       const priceString = deliveryOption.priceCents === 0
         ? 'FREE Shipping'

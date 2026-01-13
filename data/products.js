@@ -792,7 +792,7 @@ console.log(products);
 export let products = [];
 
 // better version, fetch using promise
-export  async function loadProductsFetch(fun) {
+export  async function loadProductsFetch() {
   // whatever we fetch, go to response
    const promise =  await fetch(
     'https://supersimplebackend.dev/products'
@@ -814,13 +814,31 @@ export  async function loadProductsFetch(fun) {
       }
 
     });
-    console.log('load products');
+    console.log('load products from backend');
   }).catch((error) => {
     // use catch for error in promise
     console.log('Fetch: unexpected error. Please try again later')
     console.log(error);
   });
-  fun();
+  // fun();
   return promise;
+}
+
+//search bar on amazon.com
+export function filterProductsBySearch(products, searchText) {
+  const normalizedText = searchText.trim().toLowerCase();
+
+  if (!normalizedText) {
+    return products;
+  }
+
+  return products.filter(product => {
+    return (
+      product.name.toLowerCase().includes(normalizedText) ||
+      product.keywords.some(keyword =>
+        keyword.toLowerCase().includes(normalizedText)
+      )
+    );
+  });
 }
 

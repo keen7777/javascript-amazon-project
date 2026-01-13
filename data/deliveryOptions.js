@@ -12,11 +12,20 @@ export function getDeliveryOption(deliveryOptionId) {
 }
 
 export function getOrderPlacedTime() {
-  return dayjs().format('MMMM D');
+  return dayjs().toISOString();
 }
 
+export function calculateStatusProgress(orderPlacedTime, deliveryTime) {
+  const timePassedMs = dayjs().diff(dayjs(orderPlacedTime));
+  const totalDeliveryTimeMs = dayjs(deliveryTime).diff(dayjs(orderPlacedTime));
+  const progress = Math.min(Math.max(timePassedMs / totalDeliveryTimeMs, 0), 1);
+  return progress;
+}
+
+
+
 // E15,l 
-export function calculateDeliveryDate(deliveryOption) {
+export function calculateDeliveryTime(deliveryOption) {
   // 从配送方式列表中，找到当前商品已选择的那一种
   // 从cartItem的id里面找具体的价钱和日期，完整的option（相当于是嵌套）
   let checkToday = dayjs();
@@ -33,9 +42,11 @@ export function calculateDeliveryDate(deliveryOption) {
     }
   } 
   const today = dayjs();
-  const deliveryDate = today.add(dueDate, 'days');
-  const dateString = deliveryDate.format('dddd, MMMM D');
-  return dateString;
+  // const deliveryDate = today.add(dueDate, 'days');
+  // const dateString = deliveryDate.format('dddd, MMMM D');
+  // return dateString;
+  const deliveryTime = today.add(dueDate, 'days').toISOString();
+  return deliveryTime;
 }
 
 // inside helper function from E15e, skip weekends
