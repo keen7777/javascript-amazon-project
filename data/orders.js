@@ -86,6 +86,8 @@ export function renderOrdersGrid(orders) {
 
   // console.log(ordersHTML);
   document.querySelector('.js-orders-grid').innerHTML = ordersHTML;
+  // show 0
+  updateCartQuantityDisplay(cart.calculateCartQuantity(cart));
 
   // --- event delegation ---
   const buyAgainButtons = document.querySelectorAll('.js-buy-again-button');

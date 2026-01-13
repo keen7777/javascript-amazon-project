@@ -1,4 +1,3 @@
-import { cart } from "../data/cart-class.js";
 
 // ui/modifyCart.js
 export function updateCartQuantityDisplay(quantity) {
@@ -7,7 +6,7 @@ export function updateCartQuantityDisplay(quantity) {
   );
 
   elements.forEach(el => {
-    el.innerHTML = quantity === 0 ? '' : quantity;
+    el.innerHTML = quantity === 0 ? '0' : quantity;
   });
 }
 

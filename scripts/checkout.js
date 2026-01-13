@@ -6,7 +6,6 @@ import { cart } from '../data/cart-class.js';
 import { addOrder } from '../data/orders.js';
 
 // load using backend
-import { loadCartFetch } from '../data/cart.js';
 import { loadProductsFetch } from '../data/products.js';
 
 import { createOrderFromCart } from './orderFactory.js';
@@ -72,7 +71,7 @@ async function loadPage() {
   try {
     await Promise.all([
       loadProductsFetch(),
-      loadCartFetch()
+      cart.loadCartFetch()
     ]);
   } catch (error) {
     // remember only catch once for the closest method, then it won't bubble out.

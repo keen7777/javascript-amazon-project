@@ -154,6 +154,22 @@ class Cart {
         this.saveToStorage();
     }
 
+    // backend practice:
+    async loadCartFetch() {
+    // whatever we fetch, go to response
+    try {
+        const response = await fetch('https://supersimplebackend.dev/cart');
+        const text = await response.text();
+        console.log(`in loadCartFetch function : ${text}`);
+        return text;
+    } catch (error) {
+        // use catch for error in promise
+        console.log('Fetch: unexpected error. Please try again later')
+        console.log(error);
+    }
+}
+
+
 }
 
 
