@@ -7,19 +7,21 @@ const productId = url.searchParams.get('productId');
 console.log('check tracking');
 console.log(orderId);
 console.log(productId);
-renderTrackingPage();
+renderTrackingPage(orderId,productId);
 
-export function renderTrackingPage () {
+export function renderTrackingPage(orderId, productId) {
     const itemsList = getAnOrder(orderId).orderItemsInfo;
-    let matchingItem;
-    itemsList.forEach(item => {
-        if (item.productId === productId) {
-            matchingItem = item;
-        }
-    });
-    
-    const TrackingHTML = 
-    `<div class="order-tracking js-order-tracking">
+    const matchingItem = itemsList.find(
+        item => item.productId === productId
+    );
+
+    if (!matchingItem) {
+        console.error('No matching item found');
+        return;
+    }
+
+    const TrackingHTML =
+        `<div class="order-tracking js-order-tracking">
         <a class="back-to-orders-link link-primary" href="orders.html">
           View all orders
         </a>
@@ -55,6 +57,6 @@ export function renderTrackingPage () {
         </div>
       </div>
     `
-document.querySelector('.js-order-tracking')
-    .innerHTML = TrackingHTML;
+    document.querySelector('.js-order-tracking')
+        .innerHTML = TrackingHTML;
 }

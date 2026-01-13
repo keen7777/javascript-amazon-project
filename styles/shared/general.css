@@ -39,10 +39,22 @@ input, select, button {
 }
 
 .button-primary:active {
-  background: rgb(255, 216, 20);
+  background: #ffd814;
   border-color: rgb(252, 210, 0);
   box-shadow: none;
 }
+
+.button-primary.disabled,
+.button-primary:disabled {
+  background-color: #ffeb86;      /* 灰色背景 */ 
+  border: none;        /* 灰色边框 */
+  cursor: not-allowed;         /* 不可点击的鼠标样式 */
+  box-shadow: none;
+  color: #5d5d5d;
+}
+
+
+
 
 .button-secondary {
   color: rgb(33, 33, 33);

@@ -15,6 +15,14 @@ import { updateCartQuantityDisplay } from '../ui/modifyCart.js';
 
 export function placeOrder() {
   try {
+    // 0, see if cart is empty:
+    const cartQuantity = cart.calculateCartQuantity();
+
+    if (cartQuantity === 0) {
+      console.log('Your cart is empty, cannot place order.');
+      togglePaymentButtons(); // 可选：禁用按钮或更新样式
+      return; // 直接结束函数
+    }
     // 1, create order snapshot
     const order = createOrderFromCart();
 
@@ -36,11 +44,23 @@ export function placeOrder() {
   }
 }
 
+export function togglePaymentButtons() {
+  const placeOrderButton = document.querySelector('.js-place-order');
+  if (!placeOrderButton) return;
+
+  if (cart.calculateCartQuantity() === 0) {
+    placeOrderButton.disabled = true;
+  } else {
+    placeOrderButton.disabled = false;
+  }
+}
+
 
 export function rerenderCheckoutPage() {
   renderOrderSummary();
   renderPaymentSummary(placeOrder);
   renderCheckoutHeader();
+  togglePaymentButtons();
 }
 
 //await for async code: shortcut for promise, 

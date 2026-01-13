@@ -13,6 +13,13 @@ import { deliveryOptions, getDeliveryOption, calculateDeliveryDate } from '../..
 
 
 export function renderOrderSummary() {
+  const container = document.querySelector('.js-order-summary');
+  if (!container) return;
+
+  if (!cart || cart.cartItems.length === 0) {
+    container.innerHTML = renderEmptyCart();
+    return;
+  }
   let cartSummaryHTML = '';
   cart.cartItems.forEach(cartItem => {
     const productId = cartItem.productId;
@@ -224,6 +231,21 @@ function handleQuantityKeydown(e, rerender) {
   }
 }
 
+function renderEmptyCart() {
+  const emptyCartHTML =
+  `
+    <div class="empty-cart">
+      <p class="empty-cart-text">
+        Your cart is empty.
+      </p>
+
+      
+      <a href="amazon.html" class="button-primary view-products-link"> View products</a>
+      
+    </div>
+  `;
+  return emptyCartHTML;
+}
 //helper function, wrap save logic
 
 function saveQuantity(productId) {
